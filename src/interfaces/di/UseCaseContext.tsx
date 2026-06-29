@@ -15,6 +15,7 @@ import { IUseCaseRegistry } from '@application/ports/IUseCaseRegistry';
 import { BriefController } from '../controllers/BriefController';
 import { FeedController } from '../controllers/FeedController';
 import { SearchController } from '../controllers/SearchController';
+import { SummariseController } from '../controllers/SummariseController';
 
 // ── Brief controller context ──────────────────────────────────────────────────
 
@@ -28,6 +29,10 @@ const FeedControllerContext = createContext<FeedController | null>(null);
 
 const SearchControllerContext = createContext<SearchController | null>(null);
 
+// ── Summarise controller context ──────────────────────────────────────────────
+
+const SummariseControllerContext = createContext<SummariseController | null>(null);
+
 // ── Provider ──────────────────────────────────────────────────────────────────
 
 interface ProviderProps {
@@ -36,14 +41,17 @@ interface ProviderProps {
 }
 
 export function UseCaseProvider({ registry, children }: ProviderProps) {
-  const briefController  = useMemo(() => new BriefController(registry),  [registry]);
-  const feedController   = useMemo(() => new FeedController(registry),   [registry]);
-  const searchController = useMemo(() => new SearchController(registry), [registry]);
+  const briefController     = useMemo(() => new BriefController(registry),     [registry]);
+  const feedController      = useMemo(() => new FeedController(registry),      [registry]);
+  const searchController    = useMemo(() => new SearchController(registry),    [registry]);
+  const summariseController = useMemo(() => new SummariseController(registry), [registry]);
   return (
     <ControllerContext.Provider value={briefController}>
       <FeedControllerContext.Provider value={feedController}>
         <SearchControllerContext.Provider value={searchController}>
-          {children}
+          <SummariseControllerContext.Provider value={summariseController}>
+            {children}
+          </SummariseControllerContext.Provider>
         </SearchControllerContext.Provider>
       </FeedControllerContext.Provider>
     </ControllerContext.Provider>
@@ -72,6 +80,14 @@ export function useSearchController(): SearchController {
   const controller = useContext(SearchControllerContext);
   if (!controller) {
     throw new Error('useSearchController must be used within a <UseCaseProvider>.');
+  }
+  return controller;
+}
+
+export function useSummariseController(): SummariseController {
+  const controller = useContext(SummariseControllerContext);
+  if (!controller) {
+    throw new Error('useSummariseController must be used within a <UseCaseProvider>.');
   }
   return controller;
 }

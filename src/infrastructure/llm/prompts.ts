@@ -14,6 +14,7 @@
 
 import { Brief } from '@domain/entities/Brief';
 import { Article } from '@domain/entities/Article';
+import { ArticleSummaryInput } from '@application/use-cases/SummariseArticleUseCase';
 
 // ── System prompts ───────────────────────────────────────────────────────────
 
@@ -111,6 +112,30 @@ export function buildSummarisationPrompt(article: Article): string {
   lines.push(`SOURCE: ${article.sourceName.value}`);
   lines.push('');
   lines.push('Please provide a 2-3 sentence summary of the above article.');
+
+  return lines.join('\n');
+}
+
+/**
+ * Build the user message for single-article summarisation from a plain DTO
+ * (no domain entity required).
+ *
+ * Used by {@link SummariseArticleUseCase} when only the title and description
+ * from the feed card are available.
+ *
+ * @param input - Minimal article data (title + description).
+ * @returns     A multi-line string ready to be sent as the `user` message.
+ */
+export function buildArticleSummaryPrompt(input: ArticleSummaryInput): string {
+  const lines: string[] = [];
+  lines.push(`TITLE: ${input.title}`);
+
+  if (input.description.trim().length > 0) {
+    lines.push(`DESCRIPTION: ${input.description}`);
+  }
+
+  lines.push('');
+  lines.push('Please provide a concise 3-sentence summary of the above article.');
 
   return lines.join('\n');
 }

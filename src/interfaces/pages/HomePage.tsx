@@ -25,11 +25,13 @@ import { FeedCategoryBar } from '../components/FeedCategoryBar';
 import { SearchBar } from '../components/SearchBar';
 import { BriefView } from '../components/BriefView';
 import { ArticleFeedCard } from '../components/ArticleFeedCard';
+import { ArticleDetailModal } from '../components/ArticleDetailModal';
 import { FeedSkeleton } from '../components/FeedSkeleton';
 import { LoadMoreButton } from '../components/LoadMoreButton';
 import { Spinner } from '../components/Spinner';
 import { ErrorBanner } from '../components/ErrorBanner';
 import { cn } from '../lib/cn';
+import { ArticleDTO } from '@application/dtos/ArticleDTO';
 
 const DEFAULT_CATEGORIES = ['technology', 'business', 'science'];
 
@@ -38,6 +40,9 @@ export function HomePage() {
 
   // null = "All categories", a string = single-category filter
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
+
+  // Article selected for detail modal (null = modal closed)
+  const [selectedArticle, setSelectedArticle] = useState<ArticleDTO | null>(null);
 
   const {
     articles: feedArticles,
@@ -206,7 +211,11 @@ export function HomePage() {
               <>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                   {displayArticles.map((article) => (
-                    <ArticleFeedCard key={article.id} article={article} />
+                    <ArticleFeedCard
+                      key={article.id}
+                      article={article}
+                      onSelect={setSelectedArticle}
+                    />
                   ))}
                 </div>
 
@@ -248,6 +257,12 @@ export function HomePage() {
           </>
         )}
       </section>
+
+      {/* ── Article detail modal ─────────────────────────────────────────── */}
+      <ArticleDetailModal
+        article={selectedArticle}
+        onClose={() => setSelectedArticle(null)}
+      />
     </div>
   );
 }

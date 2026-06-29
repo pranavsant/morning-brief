@@ -2,7 +2,9 @@
  * ArticleFeedCard — large card for the main news feed grid.
  *
  * Displays headline, source name, publish time, and a thumbnail.
- * Clicking the card opens the article in a new tab.
+ * Clicking the card calls `onSelect` to open the article detail modal,
+ * which in turn provides direct access to the "Read full article" link
+ * and the "Summarize with AI" button.
  *
  * Layer: interfaces.
  */
@@ -12,6 +14,8 @@ import { cn } from '../lib/cn';
 
 interface Props {
   article: ArticleDTO;
+  /** Called when the user clicks the card to open the detail modal. */
+  onSelect: (article: ArticleDTO) => void;
 }
 
 /** Placeholder shown when an article has no thumbnail. */
@@ -38,17 +42,16 @@ function categoryEmoji(category: string): string {
   return map[category] ?? '📰';
 }
 
-export function ArticleFeedCard({ article }: Props) {
+export function ArticleFeedCard({ article, onSelect }: Props) {
   return (
-    <a
-      href={article.url}
-      target="_blank"
-      rel="noreferrer"
+    <button
+      type="button"
+      onClick={() => onSelect(article)}
       className={cn(
-        'group flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm',
+        'group flex w-full flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm text-left',
         'transition hover:border-brand-300 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-brand-400',
       )}
-      aria-label={article.title}
+      aria-label={`Open details for: ${article.title}`}
     >
       {/* Thumbnail */}
       <div className="relative h-44 w-full flex-shrink-0 overflow-hidden bg-slate-100">
@@ -90,6 +93,6 @@ export function ArticleFeedCard({ article }: Props) {
           </span>
         </div>
       </div>
-    </a>
+    </button>
   );
 }

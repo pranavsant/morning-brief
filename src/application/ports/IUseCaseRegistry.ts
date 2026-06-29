@@ -14,10 +14,12 @@ import { GenerateMorningBriefUseCase } from '../use-cases/GenerateMorningBriefUs
 import { GetLatestBriefUseCase } from '../use-cases/GetLatestBriefUseCase';
 import { FetchTopHeadlinesUseCase } from '../use-cases/FetchTopHeadlinesUseCase';
 import { SearchArticlesUseCase } from '../use-cases/SearchArticlesUseCase';
+import { SummariseArticleUseCase } from '../use-cases/SummariseArticleUseCase';
 
 export interface IUseCaseRegistry {
   generateMorningBrief: GenerateMorningBriefUseCase;
   getLatestBrief:       GetLatestBriefUseCase;
   fetchTopHeadlines:    FetchTopHeadlinesUseCase;
   searchArticles:       SearchArticlesUseCase;
+  summariseArticle:     SummariseArticleUseCase;
 }
