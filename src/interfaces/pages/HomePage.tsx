@@ -32,8 +32,60 @@ import { FeedSkeleton } from '../components/FeedSkeleton';
 import { LoadMoreButton } from '../components/LoadMoreButton';
 import { Spinner } from '../components/Spinner';
 import { ErrorBanner } from '../components/ErrorBanner';
+import { EmptyState } from '../components/EmptyState';
+import { FeedErrorState } from '../components/FeedErrorState';
 import { cn } from '../lib/cn';
 import { ArticleDTO } from '@application/dtos/ArticleDTO';
+
+/* ── Inline SVG illustrations for empty states ──────────────────────────── */
+
+function SearchEmptyIllustration() {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 80 80"
+      className="h-20 w-20"
+      fill="none"
+      aria-hidden="true"
+    >
+      {/* Magnifying glass body */}
+      <circle cx="34" cy="34" r="18" className="stroke-current" strokeWidth="5" />
+      {/* Handle */}
+      <line
+        x1="46.5"
+        y1="46.5"
+        x2="62"
+        y2="62"
+        className="stroke-current"
+        strokeWidth="5"
+        strokeLinecap="round"
+      />
+      {/* X mark inside glass */}
+      <line x1="27" y1="27" x2="41" y2="41" className="stroke-red-400 dark:stroke-red-500" strokeWidth="3.5" strokeLinecap="round" />
+      <line x1="41" y1="27" x2="27" y2="41" className="stroke-red-400 dark:stroke-red-500" strokeWidth="3.5" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function FeedEmptyIllustration() {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 80 80"
+      className="h-20 w-20"
+      fill="none"
+      aria-hidden="true"
+    >
+      {/* Newspaper / page outline */}
+      <rect x="12" y="16" width="56" height="48" rx="5" className="fill-current opacity-20" />
+      <rect x="12" y="16" width="56" height="48" rx="5" className="stroke-current" strokeWidth="4" />
+      {/* Lines representing text */}
+      <line x1="22" y1="30" x2="58" y2="30" className="stroke-current" strokeWidth="3.5" strokeLinecap="round" />
+      <line x1="22" y1="40" x2="50" y2="40" className="stroke-current" strokeWidth="3.5" strokeLinecap="round" />
+      <line x1="22" y1="50" x2="44" y2="50" className="stroke-current" strokeWidth="3.5" strokeLinecap="round" />
+    </svg>
+  );
+}
 
 export function HomePage() {
   const { brief, loading: briefLoading, error: briefError, generate, reset } = useMorningBrief();
@@ -93,6 +145,12 @@ export function HomePage() {
     ? `Results for "${query.trim()}"`
     : 'Top Headlines';
 
+  // Full-section error: error occurred on initial load with no articles to show.
+  const showFullError = !!displayError && displayArticles.length === 0 && !displayLoading;
+
+  // Load-more inline error: error occurred on pagination but we already have articles.
+  const showInlineError = !!displayError && displayArticles.length > 0;
+
   return (
     <div className="mx-auto max-w-screen-xl px-4 py-10">
       {/* ── Page header ─────────────────────────────────────────────────── */}
@@ -138,7 +196,11 @@ export function HomePage() {
 
         {briefError && (
           <div className="mt-4">
-            <ErrorBanner message={briefError} />
+            <ErrorBanner
+              message={briefError}
+              onRetry={handleGenerate}
+              onDismiss={reset}
+            />
           </div>
         )}
         {briefLoading && (
@@ -194,19 +256,37 @@ export function HomePage() {
           </div>
         )}
 
-        {/* ── Error banner ─────────────────────────────────────────────────── */}
-        {displayError && (
+        {/* ── Load-more inline error (some articles already visible) ──────── */}
+        {showInlineError && (
           <div className="mb-4">
             <ErrorBanner
-              message={displayError}
+              message={displayError!}
+              onRetry={isSearchActive ? () => { void searchLoadMore(); } : () => { void feedLoadMore(); }}
               onDismiss={isSearchActive ? clearSearch : reload}
             />
           </div>
         )}
 
-        {/* ── Article grid / skeleton / empty state ────────────────────────── */}
+        {/* ── Article grid / skeleton / empty state / full error ───────────── */}
         {displayLoading ? (
           <FeedSkeleton count={isSearchActive ? 12 : 20} />
+        ) : showFullError ? (
+          /* ── Full-section error state ──────────────────────────────────── */
+          isSearchActive ? (
+            <FeedErrorState
+              message={displayError!}
+              onRetry={() => submitSearch(query)}
+              retryLabel="Search again"
+              secondaryLabel="Clear search"
+              onSecondary={clearSearch}
+            />
+          ) : (
+            <FeedErrorState
+              message={displayError!}
+              onRetry={reload}
+              retryLabel="Refresh headlines"
+            />
+          )
         ) : (
           <>
             {displayArticles.length > 0 ? (
@@ -230,32 +310,21 @@ export function HomePage() {
                 />
               </>
             ) : (
-              !displayError && (
-                <div className="flex flex-col items-center py-20 text-center">
-                  {isSearchActive ? (
-                    <>
-                      <span className="mb-3 text-4xl" aria-hidden="true">🔍</span>
-                      <p className="text-base font-medium text-slate-700 dark:text-slate-300">
-                        No results for &ldquo;{query.trim()}&rdquo;
-                      </p>
-                      <p className="mt-1 text-sm text-slate-400 dark:text-slate-500">
-                        Try different keywords or{' '}
-                        <button
-                          type="button"
-                          onClick={clearSearch}
-                          className="font-medium text-brand-600 hover:text-brand-800 focus:underline focus:outline-none dark:text-brand-400 dark:hover:text-brand-300"
-                        >
-                          browse the top headlines
-                        </button>
-                        .
-                      </p>
-                    </>
-                  ) : (
-                    <p className="text-sm text-slate-400 dark:text-slate-500">
-                      No headlines available. Try refreshing.
-                    </p>
-                  )}
-                </div>
+              /* ── Empty state ─────────────────────────────────────────────── */
+              isSearchActive ? (
+                <EmptyState
+                  illustration={<SearchEmptyIllustration />}
+                  title={`No results for "${query.trim()}"`}
+                  description="Try different keywords, check your spelling, or browse the latest top headlines."
+                  primaryAction={{ label: 'Clear search', onClick: clearSearch }}
+                />
+              ) : (
+                <EmptyState
+                  illustration={<FeedEmptyIllustration />}
+                  title="No headlines available right now"
+                  description="We couldn't load any articles at the moment. This is usually temporary — try refreshing."
+                  primaryAction={{ label: '↻ Refresh', onClick: reload }}
+                />
               )
             )}
           </>

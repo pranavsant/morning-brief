@@ -9,14 +9,40 @@
  */
 
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useSavedArticles } from '../hooks/useSavedArticles';
 import { ArticleFeedCard } from '../components/ArticleFeedCard';
 import { ArticleDetailModal } from '../components/ArticleDetailModal';
+import { EmptyState } from '../components/EmptyState';
 import { ArticleDTO } from '@application/dtos/ArticleDTO';
+
+function BookmarkIllustration() {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 80 80"
+      className="h-20 w-20"
+      fill="none"
+      aria-hidden="true"
+    >
+      {/* Bookmark ribbon */}
+      <path
+        d="M20 12h40a4 4 0 0 1 4 4v48l-24-14L16 64V16a4 4 0 0 1 4-4z"
+        className="fill-current opacity-20 stroke-current"
+        strokeWidth="4"
+        strokeLinejoin="round"
+      />
+      {/* Plus mark — "add" affordance */}
+      <line x1="40" y1="28" x2="40" y2="44" className="stroke-brand-400 dark:stroke-brand-500" strokeWidth="3.5" strokeLinecap="round" />
+      <line x1="32" y1="36" x2="48" y2="36" className="stroke-brand-400 dark:stroke-brand-500" strokeWidth="3.5" strokeLinecap="round" />
+    </svg>
+  );
+}
 
 export function SavedPage() {
   const { savedArticles, toggleSaved, isSaved, clearAll } = useSavedArticles();
   const [selectedArticle, setSelectedArticle] = useState<ArticleDTO | null>(null);
+  const navigate = useNavigate();
 
   return (
     <main className="mx-auto max-w-screen-xl px-4 py-10">
@@ -46,16 +72,14 @@ export function SavedPage() {
 
       {/* ── Empty state ──────────────────────────────────────────────────── */}
       {savedArticles.length === 0 ? (
-        <div className="flex flex-col items-center py-24 text-center">
-          <span className="mb-4 text-5xl" aria-hidden="true">🔖</span>
-          <p className="text-base font-medium text-slate-700 dark:text-slate-300">
-            Nothing saved yet
-          </p>
-          <p className="mt-2 max-w-xs text-sm text-slate-400 dark:text-slate-500">
-            Tap the bookmark icon on any article card or inside the article detail view to save it
-            here for later reading.
-          </p>
-        </div>
+        <EmptyState
+          illustration={<BookmarkIllustration />}
+          title="Nothing saved yet"
+          description="Tap the bookmark icon on any article card or inside the article detail view to save it here for later reading."
+          primaryAction={{ label: 'Browse headlines', onClick: () => navigate('/') }}
+          secondaryAction={{ label: 'Read your brief', onClick: () => navigate('/brief') }}
+          paddingClass="py-24"
+        />
       ) : (
         /* ── Article grid ────────────────────────────────────────────────── */
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">

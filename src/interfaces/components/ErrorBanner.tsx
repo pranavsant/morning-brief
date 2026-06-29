@@ -1,5 +1,5 @@
 /**
- * ErrorBanner — inline error message with an optional dismiss button.
+ * ErrorBanner — inline error message with optional dismiss and retry actions.
  *
  * Used inside panels (AI Summary, Related Context) as well as page-level
  * error states. Styled with a red/rose palette to differentiate it from
@@ -8,6 +8,7 @@
  * Props:
  *   message   — human-readable error text to display
  *   onDismiss — optional callback; when provided a "Dismiss" button appears
+ *   onRetry   — optional callback; when provided a "Try again" button appears
  *
  * Layer: interfaces.
  */
@@ -15,9 +16,10 @@
 interface Props {
   message: string;
   onDismiss?: () => void;
+  onRetry?: () => void;
 }
 
-export function ErrorBanner({ message, onDismiss }: Props) {
+export function ErrorBanner({ message, onDismiss, onRetry }: Props) {
   return (
     <div
       role="alert"
@@ -41,15 +43,28 @@ export function ErrorBanner({ message, onDismiss }: Props) {
       {/* Message */}
       <span className="flex-1 leading-relaxed">{message}</span>
 
-      {/* Dismiss button */}
-      {onDismiss && (
-        <button
-          type="button"
-          onClick={onDismiss}
-          className="flex-shrink-0 font-medium text-red-600 underline-offset-2 hover:underline focus:outline-none focus:ring-2 focus:ring-red-400 dark:text-red-400"
-        >
-          Dismiss
-        </button>
+      {/* Action buttons */}
+      {(onRetry || onDismiss) && (
+        <div className="flex flex-shrink-0 items-center gap-3">
+          {onRetry && (
+            <button
+              type="button"
+              onClick={onRetry}
+              className="font-medium text-red-600 underline-offset-2 hover:underline focus:outline-none focus:ring-2 focus:ring-red-400 dark:text-red-400"
+            >
+              Try again
+            </button>
+          )}
+          {onDismiss && (
+            <button
+              type="button"
+              onClick={onDismiss}
+              className="font-medium text-red-600 underline-offset-2 hover:underline focus:outline-none focus:ring-2 focus:ring-red-400 dark:text-red-400"
+            >
+              Dismiss
+            </button>
+          )}
+        </div>
       )}
     </div>
   );

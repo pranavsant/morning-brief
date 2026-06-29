@@ -20,7 +20,39 @@ import { CategoryPicker, CATEGORIES } from '../components/CategoryPicker';
 import { BriefView } from '../components/BriefView';
 import { Spinner } from '../components/Spinner';
 import { ErrorBanner } from '../components/ErrorBanner';
+import { EmptyState } from '../components/EmptyState';
 import { cn } from '../lib/cn';
+
+function BriefIdleIllustration() {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 80 80"
+      className="h-20 w-20"
+      fill="none"
+      aria-hidden="true"
+    >
+      {/* Coffee cup body */}
+      <path
+        d="M16 32h40l-4 28H20L16 32z"
+        className="fill-current opacity-20 stroke-current"
+        strokeWidth="4"
+        strokeLinejoin="round"
+      />
+      {/* Cup handle */}
+      <path
+        d="M56 38h6a6 6 0 0 1 0 12h-6"
+        className="stroke-current"
+        strokeWidth="4"
+        strokeLinecap="round"
+      />
+      {/* Steam lines */}
+      <path d="M28 24c0-4 4-4 4-8" className="stroke-brand-400 dark:stroke-brand-500" strokeWidth="3" strokeLinecap="round" />
+      <path d="M36 24c0-4 4-4 4-8" className="stroke-brand-400 dark:stroke-brand-500" strokeWidth="3" strokeLinecap="round" />
+      <path d="M44 24c0-4 4-4 4-8" className="stroke-brand-400 dark:stroke-brand-500" strokeWidth="3" strokeLinecap="round" />
+    </svg>
+  );
+}
 
 export function BriefPage() {
   const { brief, loading, error, generate, reset } = useMorningBrief();
@@ -114,7 +146,11 @@ export function BriefPage() {
       {/* ── Feedback states ──────────────────────────────────────────────── */}
       {error && (
         <div className="mb-6">
-          <ErrorBanner message={error} onDismiss={reset} />
+          <ErrorBanner
+            message={error}
+            onRetry={handleGenerate}
+            onDismiss={reset}
+          />
         </div>
       )}
 
@@ -132,17 +168,24 @@ export function BriefPage() {
         </section>
       )}
 
-      {/* ── Empty / idle state ──────────────────────────────────────────── */}
+      {/* ── Empty / idle state ──────────────────────────────────────────────── */}
       {!brief && !loading && !error && (
-        <div className="flex flex-col items-center py-20 text-center text-slate-400 dark:text-slate-500">
-          <span className="mb-4 text-5xl" aria-hidden="true">📋</span>
-          <p className="text-base font-medium text-slate-600 dark:text-slate-300">
-            Your brief will appear here.
-          </p>
-          <p className="mt-1 text-sm">
-            Select topics above and click <em>Generate my brief</em> to get started.
-          </p>
-        </div>
+        selected.length > 0 ? (
+          <EmptyState
+            illustration={<BriefIdleIllustration />}
+            title="Your brief will appear here"
+            description="Click Generate my brief to get a Claude-powered digest of today's top headlines."
+            primaryAction={{ label: 'Generate my brief', onClick: handleGenerate }}
+            paddingClass="py-20"
+          />
+        ) : (
+          <EmptyState
+            illustration={<BriefIdleIllustration />}
+            title="Your brief will appear here"
+            description="Select at least one topic above, then click Generate my brief."
+            paddingClass="py-20"
+          />
+        )
       )}
     </main>
   );
