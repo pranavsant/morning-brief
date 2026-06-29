@@ -14,6 +14,7 @@ import { createContext, useContext, useMemo, type ReactNode } from 'react';
 import { IUseCaseRegistry } from '@application/ports/IUseCaseRegistry';
 import { BriefController } from '../controllers/BriefController';
 import { FeedController } from '../controllers/FeedController';
+import { SearchController } from '../controllers/SearchController';
 
 // ── Brief controller context ──────────────────────────────────────────────────
 
@@ -23,6 +24,10 @@ const ControllerContext = createContext<BriefController | null>(null);
 
 const FeedControllerContext = createContext<FeedController | null>(null);
 
+// ── Search controller context ─────────────────────────────────────────────────
+
+const SearchControllerContext = createContext<SearchController | null>(null);
+
 // ── Provider ──────────────────────────────────────────────────────────────────
 
 interface ProviderProps {
@@ -31,12 +36,15 @@ interface ProviderProps {
 }
 
 export function UseCaseProvider({ registry, children }: ProviderProps) {
-  const briefController = useMemo(() => new BriefController(registry), [registry]);
-  const feedController  = useMemo(() => new FeedController(registry),  [registry]);
+  const briefController  = useMemo(() => new BriefController(registry),  [registry]);
+  const feedController   = useMemo(() => new FeedController(registry),   [registry]);
+  const searchController = useMemo(() => new SearchController(registry), [registry]);
   return (
     <ControllerContext.Provider value={briefController}>
       <FeedControllerContext.Provider value={feedController}>
-        {children}
+        <SearchControllerContext.Provider value={searchController}>
+          {children}
+        </SearchControllerContext.Provider>
       </FeedControllerContext.Provider>
     </ControllerContext.Provider>
   );
@@ -56,6 +64,14 @@ export function useFeedController(): FeedController {
   const controller = useContext(FeedControllerContext);
   if (!controller) {
     throw new Error('useFeedController must be used within a <UseCaseProvider>.');
+  }
+  return controller;
+}
+
+export function useSearchController(): SearchController {
+  const controller = useContext(SearchControllerContext);
+  if (!controller) {
+    throw new Error('useSearchController must be used within a <UseCaseProvider>.');
   }
   return controller;
 }

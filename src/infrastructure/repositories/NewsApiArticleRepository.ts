@@ -7,7 +7,7 @@
  * Layer: infrastructure.
  */
 
-import { IArticleRepository, FetchArticlesQuery } from '@domain/repositories/IArticleRepository';
+import { IArticleRepository, FetchArticlesQuery, SearchArticlesQuery } from '@domain/repositories/IArticleRepository';
 import { Article } from '@domain/entities/Article';
 import { ArticleId } from '@domain/value-objects/ArticleId';
 import { Category } from '@domain/value-objects/Category';
@@ -54,6 +54,36 @@ export class NewsApiArticleRepository implements IArticleRepository {
 
     await Promise.all(fetches);
     return results;
+  }
+
+  async searchArticles(query: SearchArticlesQuery): Promise<Article[]> {
+    let response;
+    try {
+      response = await this.client.searchByCategory({
+        category: query.q,
+        pageSize: query.pageSize ?? 20,
+        language: query.language ?? 'en',
+        sortBy:   query.sortBy   ?? 'relevancy',
+      });
+    } catch (err) {
+      const detail =
+        err instanceof NewsApiError
+          ? `HTTP ${err.statusCode}${err.newsApiCode ? ` (${err.newsApiCode})` : ''}: ${err.message}`
+          : err instanceof Error
+            ? err.message
+            : String(err);
+
+      throw new Error(
+        `NewsApiArticleRepository: search failed for query "${query.q}": ${detail}`,
+      );
+    }
+
+    // Use a placeholder Category for search results (no single category applies).
+    const generalCategory = new Category('general');
+
+    return response.articles
+      .filter((raw) => this.isUsable(raw))
+      .map((raw)    => this.toDomainEntity(raw, generalCategory));
   }
 
   // ── Private helpers ────────────────────────────────────────────────────────

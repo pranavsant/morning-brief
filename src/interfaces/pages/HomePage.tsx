@@ -3,11 +3,15 @@
  *
  * The page renders in two sections:
  *  1. Top-headline feed — auto-fetched on mount, responsive article grid.
- *     Includes a FeedCategoryBar so users can filter by a single category.
+ *     Includes:
+ *       • A SearchBar — submits queries to /v2/everything, results replace
+ *         the headline grid. The active query is reflected in ?q= URL param.
+ *       • A FeedCategoryBar — single-select category filter, hidden while
+ *         a search query is active.
  *  2. Morning Brief — pick categories, generate an AI digest.
  *
- * Pure presentation + orchestration through useFeed and useMorningBrief.
- * No business logic, no infrastructure imports.
+ * Pure presentation + orchestration through useFeed, useSearch, and
+ * useMorningBrief. No business logic, no infrastructure imports.
  *
  * Layer: interfaces.
  */
@@ -15,8 +19,10 @@
 import { useState } from 'react';
 import { useMorningBrief } from '../hooks/useMorningBrief';
 import { useFeed } from '../hooks/useFeed';
+import { useSearch } from '../hooks/useSearch';
 import { CategoryPicker } from '../components/CategoryPicker';
 import { FeedCategoryBar } from '../components/FeedCategoryBar';
+import { SearchBar } from '../components/SearchBar';
 import { BriefView } from '../components/BriefView';
 import { ArticleFeedCard } from '../components/ArticleFeedCard';
 import { FeedSkeleton } from '../components/FeedSkeleton';
@@ -32,9 +38,22 @@ export function HomePage() {
   // null = "All categories", a string = single-category filter
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
 
-  const { articles, loading: feedLoading, error: feedError, reload } = useFeed({
+  const { articles: feedArticles, loading: feedLoading, error: feedError, reload } = useFeed({
     category: activeCategory,
   });
+
+  const {
+    query,
+    setQuery,
+    submitSearch,
+    clearSearch,
+    articles: searchArticles,
+    loading: searchLoading,
+    error: searchError,
+  } = useSearch();
+
+  // A search is "active" whenever there is a non-empty query string.
+  const isSearchActive = query.trim().length > 0;
 
   const [selected, setSelected] = useState<string[]>(DEFAULT_CATEGORIES);
 
@@ -47,6 +66,16 @@ export function HomePage() {
   const handleGenerate = () => {
     void generate({ categories: selected, maxArticlesPerCategory: 5, country: 'us' });
   };
+
+  // ── Derived display values ─────────────────────────────────────────────────
+
+  const displayArticles = isSearchActive ? searchArticles : feedArticles;
+  const displayLoading  = isSearchActive ? searchLoading  : feedLoading;
+  const displayError    = isSearchActive ? searchError    : feedError;
+
+  const feedSectionTitle = isSearchActive
+    ? `Results for "${query.trim()}"`
+    : 'Top Headlines';
 
   return (
     <div className="mx-auto max-w-screen-xl px-4 py-10">
@@ -106,11 +135,12 @@ export function HomePage() {
         )}
       </section>
 
-      {/* ── Top Headlines feed ───────────────────────────────────────────── */}
+      {/* ── Top Headlines / Search results feed ─────────────────────────── */}
       <section>
+        {/* ── Section header ──────────────────────────────────────────────── */}
         <div className="mb-4 flex items-center justify-between gap-4">
-          <h2 className="font-serif text-2xl font-bold text-slate-900">Top Headlines</h2>
-          {!feedLoading && (
+          <h2 className="font-serif text-2xl font-bold text-slate-900">{feedSectionTitle}</h2>
+          {!isSearchActive && !feedLoading && (
             <button
               type="button"
               onClick={reload}
@@ -122,36 +152,76 @@ export function HomePage() {
           )}
         </div>
 
-        {/* ── Category filter tab bar ────────────────────────────────────── */}
+        {/* ── Search bar ──────────────────────────────────────────────────── */}
         <div className="mb-5">
-          <FeedCategoryBar
-            active={activeCategory}
-            onChange={setActiveCategory}
-            disabled={feedLoading}
+          <SearchBar
+            value={query}
+            onChange={setQuery}
+            onSubmit={submitSearch}
+            onClear={clearSearch}
+            disabled={feedLoading && !isSearchActive}
           />
         </div>
 
-        {feedError && (
-          <div className="mb-4">
-            <ErrorBanner message={feedError} onDismiss={reload} />
+        {/* ── Category filter — hidden during search ───────────────────────── */}
+        {!isSearchActive && (
+          <div className="mb-5">
+            <FeedCategoryBar
+              active={activeCategory}
+              onChange={setActiveCategory}
+              disabled={feedLoading}
+            />
           </div>
         )}
 
-        {feedLoading ? (
-          <FeedSkeleton count={20} />
+        {/* ── Error banner ─────────────────────────────────────────────────── */}
+        {displayError && (
+          <div className="mb-4">
+            <ErrorBanner
+              message={displayError}
+              onDismiss={isSearchActive ? clearSearch : reload}
+            />
+          </div>
+        )}
+
+        {/* ── Article grid / skeleton / empty state ────────────────────────── */}
+        {displayLoading ? (
+          <FeedSkeleton count={isSearchActive ? 12 : 20} />
         ) : (
           <>
-            {articles.length > 0 ? (
+            {displayArticles.length > 0 ? (
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                {articles.map((article) => (
+                {displayArticles.map((article) => (
                   <ArticleFeedCard key={article.id} article={article} />
                 ))}
               </div>
             ) : (
-              !feedError && (
-                <p className="py-16 text-center text-sm text-slate-400">
-                  No headlines available. Try refreshing.
-                </p>
+              !displayError && (
+                <div className="flex flex-col items-center py-20 text-center">
+                  {isSearchActive ? (
+                    <>
+                      <span className="mb-3 text-4xl" aria-hidden="true">🔍</span>
+                      <p className="text-base font-medium text-slate-700">
+                        No results for &ldquo;{query.trim()}&rdquo;
+                      </p>
+                      <p className="mt-1 text-sm text-slate-400">
+                        Try different keywords or{' '}
+                        <button
+                          type="button"
+                          onClick={clearSearch}
+                          className="font-medium text-brand-600 hover:text-brand-800 focus:underline focus:outline-none"
+                        >
+                          browse the top headlines
+                        </button>
+                        .
+                      </p>
+                    </>
+                  ) : (
+                    <p className="text-sm text-slate-400">
+                      No headlines available. Try refreshing.
+                    </p>
+                  )}
+                </div>
               )
             )}
           </>
