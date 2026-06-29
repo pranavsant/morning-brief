@@ -8,15 +8,14 @@
  */
 
 import { IUseCaseRegistry } from '@application/ports/IUseCaseRegistry';
-import { ArticleDTO } from '@application/dtos/ArticleDTO';
-import { SearchArticlesInput } from '@application/use-cases/SearchArticlesUseCase';
+import { SearchArticlesInput, SearchArticlesResult } from '@application/use-cases/SearchArticlesUseCase';
 import { ApplicationError } from '@application/errors/ApplicationError';
 import { ControllerResult } from './BriefController';
 
 export class SearchController {
   constructor(private readonly useCases: IUseCaseRegistry) {}
 
-  async search(input: SearchArticlesInput): Promise<ControllerResult<ArticleDTO[]>> {
+  async search(input: SearchArticlesInput): Promise<ControllerResult<SearchArticlesResult>> {
     try {
       const data = await this.useCases.searchArticles.execute(input);
       return { ok: true, data };

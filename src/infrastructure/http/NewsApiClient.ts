@@ -60,6 +60,8 @@ export interface TopHeadlinesParams {
   country:  string;
   /** Maximum number of results (1–100). */
   pageSize: number;
+  /** 1-based page number. Defaults to 1. */
+  page?: number;
 }
 
 export interface SearchByCategoryParams {
@@ -81,6 +83,8 @@ export interface SearchByCategoryParams {
    * Defaults to "publishedAt" when omitted.
    */
   sortBy?: 'relevancy' | 'popularity' | 'publishedAt';
+  /** 1-based page number. Defaults to 1. */
+  page?: number;
 }
 
 // ── Client ───────────────────────────────────────────────────────────────────
@@ -110,6 +114,9 @@ export class NewsApiClient {
     url.searchParams.set('category', params.category);
     url.searchParams.set('country',  params.country);
     url.searchParams.set('pageSize', String(params.pageSize));
+    if (params.page && params.page > 1) {
+      url.searchParams.set('page', String(params.page));
+    }
 
     const data = await this.request<NewsApiTopHeadlinesResponse>(url);
     return data;
@@ -131,6 +138,9 @@ export class NewsApiClient {
     url.searchParams.set('pageSize', String(params.pageSize));
     url.searchParams.set('language', params.language ?? 'en');
     url.searchParams.set('sortBy',   params.sortBy   ?? 'publishedAt');
+    if (params.page && params.page > 1) {
+      url.searchParams.set('page', String(params.page));
+    }
 
     const data = await this.request<NewsApiEverythingResponse>(url);
     return data;

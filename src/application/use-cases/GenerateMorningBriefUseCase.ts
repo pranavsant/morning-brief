@@ -58,9 +58,9 @@ export class GenerateMorningBriefUseCase {
     }
 
     // 2. Fetch articles
-    let articles;
+    let resultPage;
     try {
-      articles = await this.articleRepository.fetchTopHeadlines({
+      resultPage = await this.articleRepository.fetchTopHeadlines({
         categories:     preferences.categories,
         maxPerCategory: preferences.maxArticlesPerCategory,
         country:        input.country ?? 'us',
@@ -70,6 +70,8 @@ export class GenerateMorningBriefUseCase {
         `Failed to fetch articles: ${err instanceof Error ? err.message : String(err)}`,
       );
     }
+
+    const articles = resultPage.articles;
 
     if (articles.length === 0) {
       throw new ApplicationError(

@@ -12,15 +12,14 @@
  */
 
 import { IUseCaseRegistry } from '@application/ports/IUseCaseRegistry';
-import { ArticleDTO } from '@application/dtos/ArticleDTO';
-import { FetchTopHeadlinesInput } from '@application/use-cases/FetchTopHeadlinesUseCase';
+import { FetchTopHeadlinesInput, FetchTopHeadlinesResult } from '@application/use-cases/FetchTopHeadlinesUseCase';
 import { ApplicationError } from '@application/errors/ApplicationError';
 import { ControllerResult } from './BriefController';
 
 export class FeedController {
   constructor(private readonly useCases: IUseCaseRegistry) {}
 
-  async loadFeed(input: FetchTopHeadlinesInput = {}): Promise<ControllerResult<ArticleDTO[]>> {
+  async loadFeed(input: FetchTopHeadlinesInput = {}): Promise<ControllerResult<FetchTopHeadlinesResult>> {
     try {
       const data = await this.useCases.fetchTopHeadlines.execute(input);
       return { ok: true, data };

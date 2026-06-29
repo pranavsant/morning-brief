@@ -7,7 +7,7 @@
  * Layer: infrastructure.
  */
 
-import { IArticleRepository, FetchArticlesQuery, SearchArticlesQuery } from '@domain/repositories/IArticleRepository';
+import { IArticleRepository, FetchArticlesQuery, SearchArticlesQuery, ArticleResultPage } from '@domain/repositories/IArticleRepository';
 import { Article } from '@domain/entities/Article';
 import { ArticleId } from '@domain/value-objects/ArticleId';
 import { Category } from '@domain/value-objects/Category';
@@ -20,8 +20,9 @@ import { NewsApiError } from '../http/NewsApiError';
 export class NewsApiArticleRepository implements IArticleRepository {
   constructor(private readonly client: NewsApiClient) {}
 
-  async fetchTopHeadlines(query: FetchArticlesQuery): Promise<Article[]> {
+  async fetchTopHeadlines(query: FetchArticlesQuery): Promise<ArticleResultPage> {
     const results: Article[] = [];
+    let totalResults = 0;
 
     // NewsAPI requires one request per category
     const fetches = query.categories.map(async (category) => {
@@ -30,7 +31,11 @@ export class NewsApiArticleRepository implements IArticleRepository {
           category: category.value,
           country:  query.country ?? 'us',
           pageSize: query.maxPerCategory,
+          page:     query.page ?? 1,
         });
+
+        // Sum up totalResults across all categories for a rough hasMore signal.
+        totalResults += response.totalResults;
 
         const articles = response.articles
           .filter((raw) => this.isUsable(raw))
@@ -53,10 +58,10 @@ export class NewsApiArticleRepository implements IArticleRepository {
     });
 
     await Promise.all(fetches);
-    return results;
+    return { articles: results, totalResults };
   }
 
-  async searchArticles(query: SearchArticlesQuery): Promise<Article[]> {
+  async searchArticles(query: SearchArticlesQuery): Promise<ArticleResultPage> {
     let response;
     try {
       response = await this.client.searchByCategory({
@@ -64,6 +69,7 @@ export class NewsApiArticleRepository implements IArticleRepository {
         pageSize: query.pageSize ?? 20,
         language: query.language ?? 'en',
         sortBy:   query.sortBy   ?? 'relevancy',
+        page:     query.page     ?? 1,
       });
     } catch (err) {
       const detail =
@@ -81,9 +87,11 @@ export class NewsApiArticleRepository implements IArticleRepository {
     // Use a placeholder Category for search results (no single category applies).
     const generalCategory = new Category('general');
 
-    return response.articles
+    const articles = response.articles
       .filter((raw) => this.isUsable(raw))
       .map((raw)    => this.toDomainEntity(raw, generalCategory));
+
+    return { articles, totalResults: response.totalResults };
   }
 
   // ── Private helpers ────────────────────────────────────────────────────────

@@ -26,6 +26,7 @@ import { SearchBar } from '../components/SearchBar';
 import { BriefView } from '../components/BriefView';
 import { ArticleFeedCard } from '../components/ArticleFeedCard';
 import { FeedSkeleton } from '../components/FeedSkeleton';
+import { LoadMoreButton } from '../components/LoadMoreButton';
 import { Spinner } from '../components/Spinner';
 import { ErrorBanner } from '../components/ErrorBanner';
 import { cn } from '../lib/cn';
@@ -38,9 +39,15 @@ export function HomePage() {
   // null = "All categories", a string = single-category filter
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
 
-  const { articles: feedArticles, loading: feedLoading, error: feedError, reload } = useFeed({
-    category: activeCategory,
-  });
+  const {
+    articles: feedArticles,
+    loading: feedLoading,
+    loadingMore: feedLoadingMore,
+    error: feedError,
+    hasMore: feedHasMore,
+    reload,
+    loadMore: feedLoadMore,
+  } = useFeed({ category: activeCategory });
 
   const {
     query,
@@ -49,7 +56,10 @@ export function HomePage() {
     clearSearch,
     articles: searchArticles,
     loading: searchLoading,
+    loadingMore: searchLoadingMore,
     error: searchError,
+    hasMore: searchHasMore,
+    loadMore: searchLoadMore,
   } = useSearch();
 
   // A search is "active" whenever there is a non-empty query string.
@@ -69,9 +79,12 @@ export function HomePage() {
 
   // ── Derived display values ─────────────────────────────────────────────────
 
-  const displayArticles = isSearchActive ? searchArticles : feedArticles;
-  const displayLoading  = isSearchActive ? searchLoading  : feedLoading;
-  const displayError    = isSearchActive ? searchError    : feedError;
+  const displayArticles    = isSearchActive ? searchArticles    : feedArticles;
+  const displayLoading     = isSearchActive ? searchLoading     : feedLoading;
+  const displayLoadingMore = isSearchActive ? searchLoadingMore : feedLoadingMore;
+  const displayError       = isSearchActive ? searchError       : feedError;
+  const displayHasMore     = isSearchActive ? searchHasMore     : feedHasMore;
+  const displayLoadMore    = isSearchActive ? searchLoadMore    : feedLoadMore;
 
   const feedSectionTitle = isSearchActive
     ? `Results for "${query.trim()}"`
@@ -190,11 +203,19 @@ export function HomePage() {
         ) : (
           <>
             {displayArticles.length > 0 ? (
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                {displayArticles.map((article) => (
-                  <ArticleFeedCard key={article.id} article={article} />
-                ))}
-              </div>
+              <>
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                  {displayArticles.map((article) => (
+                    <ArticleFeedCard key={article.id} article={article} />
+                  ))}
+                </div>
+
+                <LoadMoreButton
+                  hasMore={displayHasMore}
+                  loadingMore={displayLoadingMore}
+                  onLoadMore={displayLoadMore}
+                />
+              </>
             ) : (
               !displayError && (
                 <div className="flex flex-col items-center py-20 text-center">

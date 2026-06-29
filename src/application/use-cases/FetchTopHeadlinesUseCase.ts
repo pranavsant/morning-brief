@@ -28,12 +28,20 @@ export interface FetchTopHeadlinesInput {
   readonly maxPerCategory?: number;
   /** ISO 3166-1 alpha-2 country code. Defaults to "us". */
   readonly country?: string;
+  /** 1-based page number for pagination. Defaults to 1. */
+  readonly page?: number;
+}
+
+export interface FetchTopHeadlinesResult {
+  readonly articles: ArticleDTO[];
+  /** Total results available across all categories (summed). */
+  readonly totalResults: number;
 }
 
 export class FetchTopHeadlinesUseCase {
   constructor(private readonly articleRepository: IArticleRepository) {}
 
-  async execute(input: FetchTopHeadlinesInput = {}): Promise<ArticleDTO[]> {
+  async execute(input: FetchTopHeadlinesInput = {}): Promise<FetchTopHeadlinesResult> {
     const categoryStrings: string[] =
       input.categories && input.categories.length > 0
         ? input.categories
@@ -54,12 +62,13 @@ export class FetchTopHeadlinesUseCase {
       throw new ApplicationError('No valid categories provided for the feed.');
     }
 
-    let articles;
+    let resultPage;
     try {
-      articles = await this.articleRepository.fetchTopHeadlines({
+      resultPage = await this.articleRepository.fetchTopHeadlines({
         categories,
         maxPerCategory: input.maxPerCategory ?? 5,
         country: input.country ?? 'us',
+        page: input.page ?? 1,
       });
     } catch (err) {
       throw new ApplicationError(
@@ -67,6 +76,9 @@ export class FetchTopHeadlinesUseCase {
       );
     }
 
-    return ArticleMapper.toDTOList(articles);
+    return {
+      articles: ArticleMapper.toDTOList(resultPage.articles),
+      totalResults: resultPage.totalResults,
+    };
   }
 }

@@ -15,6 +15,8 @@ export interface FetchArticlesQuery {
   /** ISO 3166-1 alpha-2 country code, e.g. "us". */
   readonly country?: string;
   readonly maxPerCategory: number;
+  /** 1-based page number for pagination. Defaults to 1. */
+  readonly page?: number;
 }
 
 export interface SearchArticlesQuery {
@@ -26,18 +28,27 @@ export interface SearchArticlesQuery {
   readonly language?: string;
   /** Sort order. Defaults to "publishedAt". */
   readonly sortBy?: 'relevancy' | 'popularity' | 'publishedAt';
+  /** 1-based page number for pagination. Defaults to 1. */
+  readonly page?: number;
+}
+
+/** Wraps a list of articles with the total count from the API. */
+export interface ArticleResultPage {
+  readonly articles: Article[];
+  /** Total results available on the API (may exceed what was fetched). */
+  readonly totalResults: number;
 }
 
 export interface IArticleRepository {
   /**
    * Fetch top-headline articles for the requested categories.
-   * Returns a flat list; callers may group by category.
+   * Returns articles + total result count for pagination.
    */
-  fetchTopHeadlines(query: FetchArticlesQuery): Promise<Article[]>;
+  fetchTopHeadlines(query: FetchArticlesQuery): Promise<ArticleResultPage>;
 
   /**
    * Search articles across all sources using a free-text query.
    * Wraps the /v2/everything endpoint.
    */
-  searchArticles(query: SearchArticlesQuery): Promise<Article[]>;
+  searchArticles(query: SearchArticlesQuery): Promise<ArticleResultPage>;
 }
