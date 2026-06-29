@@ -11,8 +11,9 @@ import { NavLink } from 'react-router-dom';
 import { cn } from '../lib/cn';
 
 const NAV_ITEMS = [
-  { to: '/',       label: '📰 Feed'       },
-  { to: '/brief',  label: '☕ Your Brief'  },
+  { to: '/',         label: '📰 Feed'       },
+  { to: '/brief',    label: '☕ Your Brief'  },
+  { to: '/settings', label: '⚙️ Preferences' },
 ] as const;
 
 export function Navbar() {

@@ -20,6 +20,7 @@ import { useState } from 'react';
 import { useMorningBrief } from '../hooks/useMorningBrief';
 import { useFeed } from '../hooks/useFeed';
 import { useSearch } from '../hooks/useSearch';
+import { useUserPreferences } from '../hooks/useUserPreferences';
 import { CategoryPicker } from '../components/CategoryPicker';
 import { FeedCategoryBar } from '../components/FeedCategoryBar';
 import { SearchBar } from '../components/SearchBar';
@@ -32,8 +33,6 @@ import { Spinner } from '../components/Spinner';
 import { ErrorBanner } from '../components/ErrorBanner';
 import { cn } from '../lib/cn';
 import { ArticleDTO } from '@application/dtos/ArticleDTO';
-
-const DEFAULT_CATEGORIES = ['technology', 'business', 'science'];
 
 export function HomePage() {
   const { brief, loading: briefLoading, error: briefError, generate, reset } = useMorningBrief();
@@ -70,13 +69,8 @@ export function HomePage() {
   // A search is "active" whenever there is a non-empty query string.
   const isSearchActive = query.trim().length > 0;
 
-  const [selected, setSelected] = useState<string[]>(DEFAULT_CATEGORIES);
-
-  const toggleCategory = (category: string) => {
-    setSelected((prev: string[]) =>
-      prev.includes(category) ? prev.filter((c: string) => c !== category) : [...prev, category],
-    );
-  };
+  // Persisted category preferences — shared with BriefPage and SettingsPage.
+  const { categories: selected, toggleCategory } = useUserPreferences();
 
   const handleGenerate = () => {
     void generate({ categories: selected, maxArticlesPerCategory: 5, country: 'us' });

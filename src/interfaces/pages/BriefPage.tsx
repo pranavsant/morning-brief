@@ -14,27 +14,19 @@
  * Layer: interfaces.
  */
 
-import { useState } from 'react';
 import { useMorningBrief } from '../hooks/useMorningBrief';
+import { useUserPreferences } from '../hooks/useUserPreferences';
 import { CategoryPicker, CATEGORIES } from '../components/CategoryPicker';
 import { BriefView } from '../components/BriefView';
 import { Spinner } from '../components/Spinner';
 import { ErrorBanner } from '../components/ErrorBanner';
 import { cn } from '../lib/cn';
 
-/** Categories pre-selected on first visit */
-const DEFAULT_SELECTED: string[] = ['technology', 'business', 'science'];
-
 export function BriefPage() {
   const { brief, loading, error, generate, reset } = useMorningBrief();
 
-  const [selected, setSelected] = useState<string[]>(DEFAULT_SELECTED);
-
-  const toggle = (category: string) => {
-    setSelected((prev) =>
-      prev.includes(category) ? prev.filter((c) => c !== category) : [...prev, category],
-    );
-  };
+  // Read from and write to persisted user preferences.
+  const { categories: selected, toggleCategory: toggle } = useUserPreferences();
 
   const handleGenerate = () => {
     void generate({ categories: selected, maxArticlesPerCategory: 5, country: 'us' });
