@@ -3,6 +3,7 @@
  *
  * The page renders in two sections:
  *  1. Top-headline feed — auto-fetched on mount, responsive article grid.
+ *     Includes a FeedCategoryBar so users can filter by a single category.
  *  2. Morning Brief — pick categories, generate an AI digest.
  *
  * Pure presentation + orchestration through useFeed and useMorningBrief.
@@ -15,6 +16,7 @@ import { useState } from 'react';
 import { useMorningBrief } from '../hooks/useMorningBrief';
 import { useFeed } from '../hooks/useFeed';
 import { CategoryPicker } from '../components/CategoryPicker';
+import { FeedCategoryBar } from '../components/FeedCategoryBar';
 import { BriefView } from '../components/BriefView';
 import { ArticleFeedCard } from '../components/ArticleFeedCard';
 import { FeedSkeleton } from '../components/FeedSkeleton';
@@ -26,7 +28,14 @@ const DEFAULT_CATEGORIES = ['technology', 'business', 'science'];
 
 export function HomePage() {
   const { brief, loading: briefLoading, error: briefError, generate, reset } = useMorningBrief();
-  const { articles, loading: feedLoading, error: feedError, reload }         = useFeed();
+
+  // null = "All categories", a string = single-category filter
+  const [activeCategory, setActiveCategory] = useState<string | null>(null);
+
+  const { articles, loading: feedLoading, error: feedError, reload } = useFeed({
+    category: activeCategory,
+  });
+
   const [selected, setSelected] = useState<string[]>(DEFAULT_CATEGORIES);
 
   const toggleCategory = (category: string) => {
@@ -99,7 +108,7 @@ export function HomePage() {
 
       {/* ── Top Headlines feed ───────────────────────────────────────────── */}
       <section>
-        <div className="mb-5 flex items-center justify-between gap-4">
+        <div className="mb-4 flex items-center justify-between gap-4">
           <h2 className="font-serif text-2xl font-bold text-slate-900">Top Headlines</h2>
           {!feedLoading && (
             <button
@@ -111,6 +120,15 @@ export function HomePage() {
               ↻ Refresh
             </button>
           )}
+        </div>
+
+        {/* ── Category filter tab bar ────────────────────────────────────── */}
+        <div className="mb-5">
+          <FeedCategoryBar
+            active={activeCategory}
+            onChange={setActiveCategory}
+            disabled={feedLoading}
+          />
         </div>
 
         {feedError && (
