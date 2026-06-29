@@ -15,6 +15,7 @@
 import { Brief } from '@domain/entities/Brief';
 import { Article } from '@domain/entities/Article';
 import { ArticleSummaryInput } from '@application/use-cases/SummariseArticleUseCase';
+import { ArticleContextInput } from '@application/use-cases/GetArticleContextUseCase';
 
 // ── System prompts ───────────────────────────────────────────────────────────
 
@@ -29,6 +30,22 @@ export const DIGEST_SYSTEM_PROMPT =
   'Write in clear markdown. Group stories by category with H2 headings. ' +
   'For each story give a one-sentence punchy summary and cite the source in italics. ' +
   'Open with a 2-sentence "TL;DR" of the day. Be neutral and factual.';
+
+/**
+ * System instruction for article related-context generation.
+ *
+ * Shapes Claude's persona for producing 3–5 bullet points of background
+ * context — key people involved, what led to the event, and why it matters.
+ * Each bullet must start with a "• " prefix so the client can parse them.
+ */
+export const CONTEXT_SYSTEM_PROMPT =
+  'You are a knowledgeable news analyst providing background context for readers. ' +
+  'Given an article title and description, produce exactly 3 to 5 concise bullet points ' +
+  'of background context covering: key people or organisations involved, what events led ' +
+  'to this story, and why it matters. ' +
+  'Each bullet MUST start with "• " (bullet character followed by a space). ' +
+  'Be factual and neutral. Do not repeat the article headline. ' +
+  'Return ONLY the bullet points — no introduction, no headings, no conclusion.';
 
 /**
  * System instruction for single-article summarisation.
@@ -136,6 +153,33 @@ export function buildArticleSummaryPrompt(input: ArticleSummaryInput): string {
 
   lines.push('');
   lines.push('Please provide a concise 3-sentence summary of the above article.');
+
+  return lines.join('\n');
+}
+
+/**
+ * Build the user message for article related-context generation.
+ *
+ * Packages the article's title and description into a structured prompt.
+ * The model is expected to return 3–5 bullet points of background context,
+ * each prefixed with "• ".
+ *
+ * @param input - Minimal article data (title + description).
+ * @returns     A multi-line string ready to be sent as the `user` message.
+ */
+export function buildArticleContextPrompt(input: ArticleContextInput): string {
+  const lines: string[] = [];
+  lines.push(`TITLE: ${input.title}`);
+
+  if (input.description.trim().length > 0) {
+    lines.push(`DESCRIPTION: ${input.description}`);
+  }
+
+  lines.push('');
+  lines.push(
+    'Please provide 3 to 5 bullet points of background context for this article. ' +
+    'Each bullet must start with "• ".',
+  );
 
   return lines.join('\n');
 }

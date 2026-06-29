@@ -14,6 +14,7 @@
 
 import { IUseCaseRegistry } from '@application/ports/IUseCaseRegistry';
 import { ArticleSummaryInput, SummariseArticleResult } from '@application/use-cases/SummariseArticleUseCase';
+import { ArticleContextInput, GetArticleContextResult } from '@application/use-cases/GetArticleContextUseCase';
 import { ApplicationError } from '@application/errors/ApplicationError';
 import { ControllerResult } from './BriefController';
 
@@ -23,6 +24,15 @@ export class SummariseController {
   async summarise(input: ArticleSummaryInput): Promise<ControllerResult<SummariseArticleResult>> {
     try {
       const data = await this.useCases.summariseArticle.execute(input);
+      return { ok: true, data };
+    } catch (err) {
+      return { ok: false, error: this.describeError(err) };
+    }
+  }
+
+  async getContext(input: ArticleContextInput): Promise<ControllerResult<GetArticleContextResult>> {
+    try {
+      const data = await this.useCases.getArticleContext.execute(input);
       return { ok: true, data };
     } catch (err) {
       return { ok: false, error: this.describeError(err) };

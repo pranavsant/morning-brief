@@ -15,6 +15,7 @@ import { GetLatestBriefUseCase } from '../use-cases/GetLatestBriefUseCase';
 import { FetchTopHeadlinesUseCase } from '../use-cases/FetchTopHeadlinesUseCase';
 import { SearchArticlesUseCase } from '../use-cases/SearchArticlesUseCase';
 import { SummariseArticleUseCase } from '../use-cases/SummariseArticleUseCase';
+import { GetArticleContextUseCase } from '../use-cases/GetArticleContextUseCase';
 
 export interface IUseCaseRegistry {
   generateMorningBrief: GenerateMorningBriefUseCase;
@@ -22,4 +23,5 @@ export interface IUseCaseRegistry {
   fetchTopHeadlines:    FetchTopHeadlinesUseCase;
   searchArticles:       SearchArticlesUseCase;
   summariseArticle:     SummariseArticleUseCase;
+  getArticleContext:    GetArticleContextUseCase;
 }

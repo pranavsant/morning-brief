@@ -1,6 +1,8 @@
 /**
- * ArticleDetailModal — overlay that shows full article metadata and an
- * on-demand "Summarize with AI" panel powered by Claude.
+ * ArticleDetailModal — overlay that shows full article metadata and two
+ * on-demand AI panels powered by Claude:
+ *   • "AI Summary"       — 2–3 sentence plain-English summary
+ *   • "Related Context"  — 3–5 bullet points of background context
  *
  * The modal uses fixed positioning (z-50) so it renders above all content.
  * Focus is trapped via keyboard; pressing Escape or clicking the backdrop
@@ -13,9 +15,10 @@
  * Layer: interfaces.
  */
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ArticleDTO } from '@application/dtos/ArticleDTO';
 import { useArticleSummary } from '../hooks/useArticleSummary';
+import { useArticleContext } from '../hooks/useArticleContext';
 import { Spinner } from './Spinner';
 import { ErrorBanner } from './ErrorBanner';
 import { cn } from '../lib/cn';
@@ -26,7 +29,11 @@ interface Props {
 }
 
 export function ArticleDetailModal({ article, onClose }: Props) {
-  const { status, summary, error, summarise, reset } = useArticleSummary();
+  const { status: sumStatus, summary, error: sumError, summarise, reset: resetSummary } = useArticleSummary();
+  const { status: ctxStatus, bullets, error: ctxError, getContext, reset: resetContext } = useArticleContext();
+
+  // Whether the Related Context panel is expanded.
+  const [contextOpen, setContextOpen] = useState(false);
 
   // Close on Escape key
   useEffect(() => {
@@ -50,17 +57,19 @@ export function ArticleDetailModal({ article, onClose }: Props) {
     };
   }, [article]);
 
-  // Reset summary state whenever a different article is opened
+  // Reset both AI panels and collapse context whenever a different article opens.
   const prevArticleId = useRef<string | null>(null);
   useEffect(() => {
     if (article && article.id !== prevArticleId.current) {
-      reset();
+      resetSummary();
+      resetContext();
+      setContextOpen(false);
       prevArticleId.current = article.id;
     }
     if (!article) {
       prevArticleId.current = null;
     }
-  }, [article, reset]);
+  }, [article, resetSummary, resetContext]);
 
   if (!article) return null;
 
@@ -68,10 +77,29 @@ export function ArticleDetailModal({ article, onClose }: Props) {
     summarise({ title: article.title, description: article.description });
   };
 
-  const isLoading    = status === 'loading';
-  const hasResult    = status === 'success' && summary !== null;
-  const hasError     = status === 'error'   && error   !== null;
-  const canSummarise = status === 'idle';
+  const handleGetContext = () => {
+    getContext({ title: article.title, description: article.description });
+  };
+
+  const handleToggleContext = () => {
+    const nextOpen = !contextOpen;
+    setContextOpen(nextOpen);
+    // Auto-fetch context the first time the panel is opened.
+    if (nextOpen && ctxStatus === 'idle') {
+      getContext({ title: article.title, description: article.description });
+    }
+  };
+
+  // Summary panel states
+  const sumLoading    = sumStatus === 'loading';
+  const sumHasResult  = sumStatus === 'success' && summary !== null;
+  const sumHasError   = sumStatus === 'error'   && sumError !== null;
+  const sumCanTrigger = sumStatus === 'idle';
+
+  // Context panel states
+  const ctxLoading    = ctxStatus === 'loading';
+  const ctxHasResult  = ctxStatus === 'success' && bullets.length > 0;
+  const ctxHasError   = ctxStatus === 'error'   && ctxError !== null;
 
   return (
     <div
@@ -139,14 +167,14 @@ export function ArticleDetailModal({ article, onClose }: Props) {
           )}
 
           {/* ── AI Summary panel ────────────────────────────────────────────── */}
-          <div className="rounded-xl border border-slate-200 bg-slate-50 p-5">
+          <div className="mb-4 rounded-xl border border-slate-200 bg-slate-50 p-5">
             <div className="mb-3 flex items-center gap-2">
               <span className="text-base" aria-hidden="true">✨</span>
               <h3 className="text-sm font-semibold text-slate-800">AI Summary</h3>
             </div>
 
             {/* Idle — primary CTA */}
-            {canSummarise && (
+            {sumCanTrigger && (
               <button
                 type="button"
                 onClick={handleSummarise}
@@ -160,16 +188,16 @@ export function ArticleDetailModal({ article, onClose }: Props) {
             )}
 
             {/* Loading state */}
-            {isLoading && (
+            {sumLoading && (
               <div className="py-2">
                 <Spinner label="Asking Claude for a summary…" />
               </div>
             )}
 
             {/* Error state */}
-            {hasError && (
+            {sumHasError && (
               <div>
-                <ErrorBanner message={error!} onDismiss={reset} />
+                <ErrorBanner message={sumError!} onDismiss={resetSummary} />
                 <button
                   type="button"
                   onClick={handleSummarise}
@@ -184,8 +212,104 @@ export function ArticleDetailModal({ article, onClose }: Props) {
             )}
 
             {/* Success — show summary text */}
-            {hasResult && (
+            {sumHasResult && (
               <p className="text-sm leading-relaxed text-slate-700">{summary}</p>
+            )}
+          </div>
+
+          {/* ── Related Context panel ────────────────────────────────────────── */}
+          <div className="rounded-xl border border-slate-200 bg-slate-50 p-5">
+            {/* Toggle header */}
+            <button
+              type="button"
+              onClick={handleToggleContext}
+              className="flex w-full items-center justify-between gap-2 text-left focus:outline-none focus:ring-2 focus:ring-brand-400 rounded-md"
+              aria-expanded={contextOpen}
+            >
+              <div className="flex items-center gap-2">
+                <span className="text-base" aria-hidden="true">🔍</span>
+                <h3 className="text-sm font-semibold text-slate-800">Related Context</h3>
+              </div>
+              {/* Chevron rotates when open */}
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                aria-hidden="true"
+                className={cn(
+                  'h-4 w-4 flex-shrink-0 text-slate-400 transition-transform duration-200',
+                  contextOpen && 'rotate-180',
+                )}
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </button>
+
+            {/* Collapsible body */}
+            {contextOpen && (
+              <div className="mt-4">
+                {/* Loading state */}
+                {ctxLoading && (
+                  <div className="py-2">
+                    <Spinner label="Claude is gathering context…" />
+                  </div>
+                )}
+
+                {/* Error state */}
+                {ctxHasError && (
+                  <div>
+                    <ErrorBanner message={ctxError!} onDismiss={resetContext} />
+                    <button
+                      type="button"
+                      onClick={handleGetContext}
+                      className={cn(
+                        'mt-3 rounded-lg bg-brand-500 px-4 py-2 text-sm font-semibold text-white shadow-sm transition',
+                        'hover:bg-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-400',
+                      )}
+                    >
+                      Retry context
+                    </button>
+                  </div>
+                )}
+
+                {/* Success — bullet list */}
+                {ctxHasResult && (
+                  <ul className="space-y-2" aria-label="Background context">
+                    {bullets.map((bullet, idx) => (
+                      <li
+                        key={idx}
+                        className="flex items-start gap-2 text-sm leading-relaxed text-slate-700"
+                      >
+                        <span
+                          className="mt-0.5 flex-shrink-0 text-brand-500"
+                          aria-hidden="true"
+                        >
+                          •
+                        </span>
+                        <span>{bullet}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+
+                {/* Fallback: dismissed error with no bullets yet — offer manual trigger */}
+                {!ctxLoading && !ctxHasResult && !ctxHasError && (
+                  <button
+                    type="button"
+                    onClick={handleGetContext}
+                    className={cn(
+                      'rounded-lg bg-brand-500 px-4 py-2 text-sm font-semibold text-white shadow-sm transition',
+                      'hover:bg-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-400',
+                    )}
+                  >
+                    Get context
+                  </button>
+                )}
+              </div>
             )}
           </div>
         </div>
