@@ -15,6 +15,7 @@ import { SourceName } from '@domain/value-objects/SourceName';
 import { DomainError } from '@domain/errors/DomainError';
 
 import { NewsApiClient, NewsApiArticleRaw } from '../http/NewsApiClient';
+import { NewsApiError } from '../http/NewsApiError';
 
 export class NewsApiArticleRepository implements IArticleRepository {
   constructor(private readonly client: NewsApiClient) {}
@@ -37,11 +38,16 @@ export class NewsApiArticleRepository implements IArticleRepository {
 
         results.push(...articles);
       } catch (err) {
-        // Re-throw as a plain Error so the application layer can wrap it
+        // Provide a richer message for typed NewsAPI failures.
+        const detail =
+          err instanceof NewsApiError
+            ? `HTTP ${err.statusCode}${err.newsApiCode ? ` (${err.newsApiCode})` : ''}: ${err.message}`
+            : err instanceof Error
+              ? err.message
+              : String(err);
+
         throw new Error(
-          `NewsApiArticleRepository: failed for category "${category.value}": ${
-            err instanceof Error ? err.message : String(err)
-          }`,
+          `NewsApiArticleRepository: failed for category "${category.value}": ${detail}`,
         );
       }
     });
