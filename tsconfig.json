@@ -17,10 +17,23 @@
     /* Paths */
     "baseUrl": ".",
     "paths": {
+      // ── Clean-Architecture layer aliases ────────────────────────────────
       "@domain/*":         ["src/domain/*"],
       "@application/*":    ["src/application/*"],
       "@infrastructure/*": ["src/infrastructure/*"],
-      "@interfaces/*":     ["src/interfaces/*"]
+      "@interfaces/*":     ["src/interfaces/*"],
+
+      // ── Shorthand aliases inside the interfaces (UI) layer ──────────────
+      // "@/" maps into src/interfaces/ for concise in-layer imports.
+      // More-specific entries are listed first; TypeScript matches them
+      // before falling through to the wildcard "@/*".
+      "@/components/*":  ["src/interfaces/components/*"],
+      "@/pages/*":       ["src/interfaces/pages/*"],
+      "@/hooks/*":       ["src/interfaces/hooks/*"],
+      "@/controllers/*": ["src/interfaces/controllers/*"],
+      "@/lib/*":         ["src/interfaces/lib/*"],
+      "@/di/*":          ["src/interfaces/di/*"],
+      "@/*":             ["src/interfaces/*"]
     },
 
     /* Strict */
