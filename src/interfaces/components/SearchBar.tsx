@@ -46,7 +46,7 @@ export function SearchBar({
       <div className="relative flex-1">
         {/* Search icon */}
         <span
-          className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-slate-400"
+          className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-slate-400 dark:text-slate-500"
           aria-hidden="true"
         >
           <svg
@@ -78,6 +78,8 @@ export function SearchBar({
             'text-sm text-slate-900 placeholder:text-slate-400',
             'focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-400/30',
             'disabled:cursor-not-allowed disabled:opacity-50',
+            'dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500',
+            'dark:focus:border-brand-500 dark:focus:ring-brand-500/30',
           )}
         />
 
@@ -90,6 +92,7 @@ export function SearchBar({
             className={cn(
               'absolute inset-y-0 right-2 flex items-center px-1',
               'text-slate-400 hover:text-slate-600 focus:outline-none',
+              'dark:text-slate-500 dark:hover:text-slate-300',
             )}
           >
             <svg

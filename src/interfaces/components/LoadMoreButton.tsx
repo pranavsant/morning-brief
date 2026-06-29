@@ -1,53 +1,46 @@
 /**
- * LoadMoreButton — "Load more" trigger shown beneath the article grid.
+ * LoadMoreButton — centred CTA that the user clicks to fetch the next page
+ * of articles.
  *
- * Displays a spinner row when `loadingMore` is true, the button when
- * more articles are available, and nothing when the list is exhausted.
+ * Renders a spinner inside the button while loading is in progress so the
+ * user gets immediate feedback without layout shift.
+ * Renders nothing when there are no more pages to load.
+ *
+ * Props:
+ *   hasMore     — when false, the button is not rendered at all
+ *   onLoadMore  — called when the button is clicked (page is not loading)
+ *   loadingMore — when true, shows spinner and disables the button
  *
  * Layer: interfaces.
  */
 
-import { cn } from '../lib/cn';
+import { Spinner } from './Spinner';
 
 interface Props {
-  /** Whether a next-page fetch is currently in-flight. */
-  loadingMore: boolean;
-  /** Whether more pages exist beyond what is currently displayed. */
   hasMore: boolean;
-  /** Called when the user clicks "Load more". */
   onLoadMore: () => void;
+  loadingMore?: boolean;
 }
 
-export function LoadMoreButton({ loadingMore, hasMore, onLoadMore }: Props) {
-  if (!hasMore && !loadingMore) return null;
+export function LoadMoreButton({ hasMore, onLoadMore, loadingMore = false }: Props) {
+  if (!hasMore) return null;
 
   return (
-    <div className="mt-8 flex justify-center">
-      {loadingMore ? (
-        <div
-          className="flex items-center gap-2 text-sm text-slate-500"
-          aria-live="polite"
-          aria-label="Loading more articles"
-        >
-          <span
-            className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-slate-300 border-t-brand-500"
-            aria-hidden="true"
-          />
-          Loading more…
-        </div>
-      ) : (
-        <button
-          type="button"
-          onClick={onLoadMore}
-          className={cn(
-            'rounded-lg border border-slate-200 bg-white px-6 py-2.5 text-sm font-semibold text-slate-700 shadow-sm',
-            'transition hover:border-brand-300 hover:bg-brand-50 hover:text-brand-700',
-            'focus:outline-none focus:ring-2 focus:ring-brand-400',
-          )}
-        >
-          Load more articles
-        </button>
-      )}
+    <div className="flex justify-center py-8">
+      <button
+        type="button"
+        onClick={onLoadMore}
+        disabled={loadingMore}
+        className="flex min-w-[160px] items-center justify-center gap-2 rounded-xl border border-brand-300 bg-white px-6 py-3 text-sm font-semibold text-brand-700 shadow-sm transition hover:bg-brand-50 focus:outline-none focus:ring-2 focus:ring-brand-400 disabled:cursor-not-allowed disabled:opacity-60 dark:border-brand-700 dark:bg-slate-900 dark:text-brand-400 dark:hover:bg-slate-800"
+        aria-busy={loadingMore}
+        aria-label={loadingMore ? 'Loading more articles…' : 'Load more articles'}
+      >
+        {loadingMore ? (
+          <Spinner label="Loading more…" inline />
+        ) : (
+          'Load more'
+        )}
+      </button>
     </div>
   );
 }

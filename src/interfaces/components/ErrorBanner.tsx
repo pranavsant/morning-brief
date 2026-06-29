@@ -1,5 +1,13 @@
 /**
- * ErrorBanner — surfaces an error message to the user.
+ * ErrorBanner — inline error message with an optional dismiss button.
+ *
+ * Used inside panels (AI Summary, Related Context) as well as page-level
+ * error states. Styled with a red/rose palette to differentiate it from
+ * neutral UI surfaces.
+ *
+ * Props:
+ *   message   — human-readable error text to display
+ *   onDismiss — optional callback; when provided a "Dismiss" button appears
  *
  * Layer: interfaces.
  */
@@ -13,17 +21,34 @@ export function ErrorBanner({ message, onDismiss }: Props) {
   return (
     <div
       role="alert"
-      className="flex items-start justify-between gap-4 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800"
+      className="flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800 dark:border-red-800 dark:bg-red-950 dark:text-red-300"
     >
-      <span>{message}</span>
+      {/* Icon */}
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 20 20"
+        fill="currentColor"
+        className="mt-0.5 h-5 w-5 flex-shrink-0 text-red-500 dark:text-red-400"
+        aria-hidden="true"
+      >
+        <path
+          fillRule="evenodd"
+          d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16ZM8.28 7.22a.75.75 0 0 0-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 1 0 1.06 1.06L10 11.06l1.72 1.72a.75.75 0 1 0 1.06-1.06L11.06 10l1.72-1.72a.75.75 0 0 0-1.06-1.06L10 8.94 8.28 7.22Z"
+          clipRule="evenodd"
+        />
+      </svg>
+
+      {/* Message */}
+      <span className="flex-1 leading-relaxed">{message}</span>
+
+      {/* Dismiss button */}
       {onDismiss && (
         <button
           type="button"
           onClick={onDismiss}
-          className="font-medium text-red-600 hover:text-red-800"
-          aria-label="Dismiss error"
+          className="flex-shrink-0 font-medium text-red-600 underline-offset-2 hover:underline focus:outline-none focus:ring-2 focus:ring-red-400 dark:text-red-400"
         >
-          ✕
+          Dismiss
         </button>
       )}
     </div>

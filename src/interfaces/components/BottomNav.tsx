@@ -100,7 +100,7 @@ const NAV_ITEMS = [
 export function BottomNav() {
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-30 border-t border-slate-200 bg-white/95 backdrop-blur-sm md:hidden"
+      className="fixed bottom-0 left-0 right-0 z-30 border-t border-slate-200 bg-white/95 backdrop-blur-sm md:hidden dark:border-slate-700 dark:bg-slate-900/95"
       aria-label="Mobile navigation"
     >
       <ul className="flex h-16 items-stretch" role="list">
@@ -114,8 +114,8 @@ export function BottomNav() {
                   'flex flex-1 flex-col items-center justify-center gap-0.5 text-[10px] font-medium transition-colors',
                   'focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-400',
                   isActive
-                    ? 'text-brand-600'
-                    : 'text-slate-500 hover:text-slate-800 active:text-brand-500',
+                    ? 'text-brand-600 dark:text-brand-400'
+                    : 'text-slate-500 hover:text-slate-800 active:text-brand-500 dark:text-slate-500 dark:hover:text-slate-200',
                 )
               }
               aria-label={label}

@@ -14,26 +14,26 @@ interface Props {
 
 function SkeletonCard() {
   return (
-    <div className="flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+    <div className="flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900">
       {/* Thumbnail placeholder */}
-      <div className="h-44 w-full animate-pulse bg-slate-200" />
+      <div className="h-44 w-full animate-pulse bg-slate-200 dark:bg-slate-800" />
       {/* Body placeholder */}
       <div className="flex flex-col gap-3 p-4">
         {/* Title */}
         <div className="space-y-1.5">
-          <div className="h-3.5 w-full animate-pulse rounded bg-slate-200" />
-          <div className="h-3.5 w-5/6 animate-pulse rounded bg-slate-200" />
-          <div className="h-3.5 w-3/4 animate-pulse rounded bg-slate-200" />
+          <div className="h-3.5 w-full animate-pulse rounded bg-slate-200 dark:bg-slate-700" />
+          <div className="h-3.5 w-5/6 animate-pulse rounded bg-slate-200 dark:bg-slate-700" />
+          <div className="h-3.5 w-3/4 animate-pulse rounded bg-slate-200 dark:bg-slate-700" />
         </div>
         {/* Description */}
         <div className="space-y-1">
-          <div className="h-3 w-full animate-pulse rounded bg-slate-100" />
-          <div className="h-3 w-4/5 animate-pulse rounded bg-slate-100" />
+          <div className="h-3 w-full animate-pulse rounded bg-slate-100 dark:bg-slate-800" />
+          <div className="h-3 w-4/5 animate-pulse rounded bg-slate-100 dark:bg-slate-800" />
         </div>
         {/* Footer */}
         <div className="mt-2 flex items-center justify-between">
-          <div className="h-3 w-24 animate-pulse rounded bg-slate-200" />
-          <div className="h-3 w-14 animate-pulse rounded bg-slate-200" />
+          <div className="h-3 w-24 animate-pulse rounded bg-slate-200 dark:bg-slate-700" />
+          <div className="h-3 w-14 animate-pulse rounded bg-slate-200 dark:bg-slate-700" />
         </div>
       </div>
     </div>

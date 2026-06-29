@@ -40,7 +40,12 @@ export function CategoryPicker({ selected, onToggle, disabled }: Props) {
               'border focus:outline-none focus:ring-2 focus:ring-brand-400',
               isActive
                 ? 'bg-brand-500 text-white border-brand-500 shadow-sm'
-                : 'bg-white text-slate-700 border-slate-300 hover:border-brand-400',
+                : [
+                    'bg-white text-slate-700 border-slate-300',
+                    'hover:border-brand-400',
+                    'dark:bg-slate-800 dark:text-slate-300 dark:border-slate-600',
+                    'dark:hover:border-brand-500',
+                  ],
               disabled && 'opacity-50 cursor-not-allowed',
             )}
             aria-pressed={isActive}

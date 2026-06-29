@@ -61,7 +61,12 @@ export function FeedCategoryBar({ active, onChange, disabled }: Props) {
               'border focus:outline-none focus:ring-2 focus:ring-brand-400',
               isActive
                 ? 'bg-brand-500 text-white border-brand-500 shadow-sm'
-                : 'bg-white text-slate-600 border-slate-200 hover:border-brand-400 hover:text-brand-700',
+                : [
+                    'bg-white text-slate-600 border-slate-200',
+                    'hover:border-brand-400 hover:text-brand-700',
+                    'dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700',
+                    'dark:hover:border-brand-500 dark:hover:text-brand-400',
+                  ],
               disabled && 'cursor-not-allowed opacity-50',
             )}
           >

@@ -116,30 +116,30 @@ export function ArticleDetailModal({ article, onClose, saved = false, onToggleSa
     >
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+        className="absolute inset-0 bg-black/50 backdrop-blur-sm dark:bg-black/70"
         onClick={onClose}
         aria-hidden="true"
       />
 
       {/* Panel */}
-      <div className="relative z-10 flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl">
+      <div className="relative z-10 flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl dark:bg-slate-900 dark:shadow-black/50">
         {/* ── Header ──────────────────────────────────────────────────────── */}
-        <div className="flex items-start justify-between gap-4 border-b border-slate-200 p-6">
+        <div className="flex items-start justify-between gap-4 border-b border-slate-200 p-6 dark:border-slate-700">
           <div className="min-w-0 flex-1">
-            <span className="mb-1.5 inline-block rounded-full bg-brand-50 px-2.5 py-0.5 text-xs font-semibold capitalize text-brand-700">
+            <span className="mb-1.5 inline-block rounded-full bg-brand-50 px-2.5 py-0.5 text-xs font-semibold capitalize text-brand-700 dark:bg-brand-950 dark:text-brand-400">
               {article.category}
             </span>
-            <h2 className="text-lg font-bold leading-snug text-slate-900">
+            <h2 className="text-lg font-bold leading-snug text-slate-900 dark:text-slate-100">
               {article.title}
             </h2>
-            <p className="mt-1 text-xs text-slate-500">
+            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
               {article.sourceName} · {article.relativeAge}
             </p>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="flex-shrink-0 rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-400"
+            className="flex-shrink-0 rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-400 dark:text-slate-500 dark:hover:bg-slate-800 dark:hover:text-slate-300"
             aria-label="Close"
           >
             <svg
@@ -167,16 +167,16 @@ export function ArticleDetailModal({ article, onClose, saved = false, onToggleSa
 
           {/* Description */}
           {article.description && (
-            <p className="mb-6 text-sm leading-relaxed text-slate-700">
+            <p className="mb-6 text-sm leading-relaxed text-slate-700 dark:text-slate-300">
               {article.description}
             </p>
           )}
 
           {/* ── AI Summary panel ────────────────────────────────────────────── */}
-          <div className="mb-4 rounded-xl border border-slate-200 bg-slate-50 p-5">
+          <div className="mb-4 rounded-xl border border-slate-200 bg-slate-50 p-5 dark:border-slate-700 dark:bg-slate-800">
             <div className="mb-3 flex items-center gap-2">
               <span className="text-base" aria-hidden="true">✨</span>
-              <h3 className="text-sm font-semibold text-slate-800">AI Summary</h3>
+              <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-200">AI Summary</h3>
             </div>
 
             {/* Idle — primary CTA */}
@@ -219,12 +219,12 @@ export function ArticleDetailModal({ article, onClose, saved = false, onToggleSa
 
             {/* Success — show summary text */}
             {sumHasResult && (
-              <p className="text-sm leading-relaxed text-slate-700">{summary}</p>
+              <p className="text-sm leading-relaxed text-slate-700 dark:text-slate-300">{summary}</p>
             )}
           </div>
 
           {/* ── Related Context panel ────────────────────────────────────────── */}
-          <div className="rounded-xl border border-slate-200 bg-slate-50 p-5">
+          <div className="rounded-xl border border-slate-200 bg-slate-50 p-5 dark:border-slate-700 dark:bg-slate-800">
             {/* Toggle header */}
             <button
               type="button"
@@ -234,7 +234,7 @@ export function ArticleDetailModal({ article, onClose, saved = false, onToggleSa
             >
               <div className="flex items-center gap-2">
                 <span className="text-base" aria-hidden="true">🔍</span>
-                <h3 className="text-sm font-semibold text-slate-800">Related Context</h3>
+                <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-200">Related Context</h3>
               </div>
               {/* Chevron rotates when open */}
               <svg
@@ -243,7 +243,7 @@ export function ArticleDetailModal({ article, onClose, saved = false, onToggleSa
                 fill="currentColor"
                 aria-hidden="true"
                 className={cn(
-                  'h-4 w-4 flex-shrink-0 text-slate-400 transition-transform duration-200',
+                  'h-4 w-4 flex-shrink-0 text-slate-400 transition-transform duration-200 dark:text-slate-500',
                   contextOpen && 'rotate-180',
                 )}
               >
@@ -288,10 +288,10 @@ export function ArticleDetailModal({ article, onClose, saved = false, onToggleSa
                     {bullets.map((bullet, idx) => (
                       <li
                         key={idx}
-                        className="flex items-start gap-2 text-sm leading-relaxed text-slate-700"
+                        className="flex items-start gap-2 text-sm leading-relaxed text-slate-700 dark:text-slate-300"
                       >
                         <span
-                          className="mt-0.5 flex-shrink-0 text-brand-500"
+                          className="mt-0.5 flex-shrink-0 text-brand-500 dark:text-brand-400"
                           aria-hidden="true"
                         >
                           •
@@ -321,12 +321,12 @@ export function ArticleDetailModal({ article, onClose, saved = false, onToggleSa
         </div>
 
         {/* ── Footer ──────────────────────────────────────────────────────── */}
-        <div className="flex items-center justify-between border-t border-slate-200 px-6 py-4">
+        <div className="flex items-center justify-between border-t border-slate-200 px-6 py-4 dark:border-slate-700">
           <div className="flex items-center gap-3">
             <button
               type="button"
               onClick={onClose}
-              className="text-sm font-medium text-slate-500 hover:text-slate-700 focus:outline-none focus:underline"
+              className="text-sm font-medium text-slate-500 hover:text-slate-700 focus:outline-none focus:underline dark:text-slate-400 dark:hover:text-slate-200"
             >
               Close
             </button>
@@ -342,8 +342,8 @@ export function ArticleDetailModal({ article, onClose, saved = false, onToggleSa
                   'flex items-center gap-1.5 rounded-lg border px-3 py-2 text-sm font-medium transition',
                   'focus:outline-none focus:ring-2 focus:ring-brand-400',
                   saved
-                    ? 'border-brand-400 bg-brand-50 text-brand-700 hover:bg-brand-100'
-                    : 'border-slate-200 bg-white text-slate-600 hover:border-brand-300 hover:text-brand-600',
+                    ? 'border-brand-400 bg-brand-50 text-brand-700 hover:bg-brand-100 dark:border-brand-600 dark:bg-brand-950 dark:text-brand-400 dark:hover:bg-brand-900'
+                    : 'border-slate-200 bg-white text-slate-600 hover:border-brand-300 hover:text-brand-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400 dark:hover:border-brand-600 dark:hover:text-brand-400',
                 )}
               >
                 {saved ? (

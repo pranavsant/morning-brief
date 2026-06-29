@@ -43,8 +43,10 @@ export function BriefPage() {
     <main className="mx-auto max-w-screen-lg px-4 py-10">
       {/* ── Page header ─────────────────────────────────────────────────── */}
       <header className="mb-8 text-center">
-        <h1 className="font-serif text-4xl font-bold text-slate-900">☕ Your Morning Brief</h1>
-        <p className="mt-2 text-slate-500">
+        <h1 className="font-serif text-4xl font-bold text-slate-900 dark:text-slate-100">
+          ☕ Your Morning Brief
+        </h1>
+        <p className="mt-2 text-slate-500 dark:text-slate-400">
           Select the topics that matter to you. Claude will read today's top headlines and craft a
           crisp, structured digest — grouped by category.
         </p>
@@ -53,16 +55,16 @@ export function BriefPage() {
       {/* ── Configuration panel ─────────────────────────────────────────── */}
       <section
         aria-label="Brief configuration"
-        className="mb-8 rounded-xl border border-slate-200 bg-white p-6 shadow-sm"
+        className="mb-8 rounded-xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-900"
       >
-        <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-slate-500">
+        <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
           Choose your topics
         </h2>
 
         <CategoryPicker selected={selected} onToggle={toggle} disabled={loading} />
 
         {/* Category helper text */}
-        <p className="mt-3 text-xs text-slate-400">
+        <p className="mt-3 text-xs text-slate-400 dark:text-slate-500">
           {selected.length === 0
             ? 'Select at least one topic to continue.'
             : `${selected.length} of ${CATEGORIES.length} topic${selected.length !== 1 ? 's' : ''} selected`}
@@ -100,7 +102,7 @@ export function BriefPage() {
               <button
                 type="button"
                 onClick={reset}
-                className="text-sm font-medium text-slate-500 hover:text-slate-700 focus:outline-none focus:underline"
+                className="text-sm font-medium text-slate-500 hover:text-slate-700 focus:outline-none focus:underline dark:text-slate-400 dark:hover:text-slate-200"
               >
                 Clear
               </button>
@@ -124,7 +126,7 @@ export function BriefPage() {
       {hasBrief && (
         <section
           aria-label="Morning brief"
-          className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm"
+          className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-900"
         >
           <BriefView brief={brief} />
         </section>
@@ -132,9 +134,11 @@ export function BriefPage() {
 
       {/* ── Empty / idle state ──────────────────────────────────────────── */}
       {!brief && !loading && !error && (
-        <div className="flex flex-col items-center py-20 text-center text-slate-400">
+        <div className="flex flex-col items-center py-20 text-center text-slate-400 dark:text-slate-500">
           <span className="mb-4 text-5xl" aria-hidden="true">📋</span>
-          <p className="text-base font-medium text-slate-600">Your brief will appear here.</p>
+          <p className="text-base font-medium text-slate-600 dark:text-slate-300">
+            Your brief will appear here.
+          </p>
           <p className="mt-1 text-sm">
             Select topics above and click <em>Generate my brief</em> to get started.
           </p>

@@ -23,8 +23,10 @@ export function SavedPage() {
       {/* ── Page header ─────────────────────────────────────────────────── */}
       <header className="mb-8 flex items-center justify-between gap-4">
         <div>
-          <h1 className="font-serif text-3xl font-bold text-slate-900">🔖 Saved Articles</h1>
-          <p className="mt-1 text-slate-500">
+          <h1 className="font-serif text-3xl font-bold text-slate-900 dark:text-slate-100">
+            🔖 Saved Articles
+          </h1>
+          <p className="mt-1 text-slate-500 dark:text-slate-400">
             {savedArticles.length === 0
               ? 'No saved articles yet.'
               : `${savedArticles.length} article${savedArticles.length === 1 ? '' : 's'} saved for later.`}
@@ -35,7 +37,7 @@ export function SavedPage() {
           <button
             type="button"
             onClick={clearAll}
-            className="flex-shrink-0 text-sm font-medium text-slate-400 hover:text-red-500 focus:outline-none focus:underline transition"
+            className="flex-shrink-0 text-sm font-medium text-slate-400 hover:text-red-500 focus:outline-none focus:underline transition dark:text-slate-500 dark:hover:text-red-400"
           >
             Clear all
           </button>
@@ -46,8 +48,10 @@ export function SavedPage() {
       {savedArticles.length === 0 ? (
         <div className="flex flex-col items-center py-24 text-center">
           <span className="mb-4 text-5xl" aria-hidden="true">🔖</span>
-          <p className="text-base font-medium text-slate-700">Nothing saved yet</p>
-          <p className="mt-2 max-w-xs text-sm text-slate-400">
+          <p className="text-base font-medium text-slate-700 dark:text-slate-300">
+            Nothing saved yet
+          </p>
+          <p className="mt-2 max-w-xs text-sm text-slate-400 dark:text-slate-500">
             Tap the bookmark icon on any article card or inside the article detail view to save it
             here for later reading.
           </p>

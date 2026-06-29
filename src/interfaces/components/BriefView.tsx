@@ -22,19 +22,19 @@ export function BriefView({ brief }: Props) {
 
   return (
     <article className="space-y-8">
-      <header className="border-b border-slate-200 pb-4">
-        <p className="text-sm font-medium uppercase tracking-wide text-brand-600">
+      <header className="border-b border-slate-200 pb-4 dark:border-slate-700">
+        <p className="text-sm font-medium uppercase tracking-wide text-brand-600 dark:text-brand-400">
           Your Morning Brief
         </p>
-        <h1 className="mt-1 font-serif text-3xl text-slate-900">{date}</h1>
-        <p className="mt-1 text-sm text-slate-500">
+        <h1 className="mt-1 font-serif text-3xl text-slate-900 dark:text-slate-100">{date}</h1>
+        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
           {brief.categories.map((c) => c[0].toUpperCase() + c.slice(1)).join(' · ')}
         </p>
       </header>
 
       {brief.summary && (
         <section
-          className="prose-sm max-w-none"
+          className="prose prose-slate prose-sm max-w-none dark:prose-invert"
           // Summary is produced by Claude and rendered through a
           // restricted, HTML-escaping markdown renderer.
           dangerouslySetInnerHTML={{ __html: renderMarkdown(brief.summary) }}
@@ -42,7 +42,7 @@ export function BriefView({ brief }: Props) {
       )}
 
       <section>
-        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">
+        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
           Sources ({brief.articles.length})
         </h2>
         <div className="grid gap-3 sm:grid-cols-2">

@@ -29,7 +29,7 @@ interface Props {
 /** Placeholder shown when an article has no thumbnail. */
 function ImagePlaceholder({ category }: { category: string }) {
   return (
-    <div className="flex h-full w-full items-center justify-center bg-slate-100">
+    <div className="flex h-full w-full items-center justify-center bg-slate-100 dark:bg-slate-800">
       <span className="text-2xl capitalize text-slate-400" aria-hidden="true">
         {categoryEmoji(category)}
       </span>
@@ -95,11 +95,12 @@ export function ArticleFeedCard({ article, onSelect, saved = false, onToggleSave
       className={cn(
         'group flex w-full flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm text-left',
         'transition hover:border-brand-300 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-brand-400',
+        'dark:border-slate-700 dark:bg-slate-900 dark:hover:border-brand-600',
       )}
       aria-label={`Open details for: ${article.title}`}
     >
       {/* Thumbnail */}
-      <div className="relative h-44 w-full flex-shrink-0 overflow-hidden bg-slate-100">
+      <div className="relative h-44 w-full flex-shrink-0 overflow-hidden bg-slate-100 dark:bg-slate-800">
         {article.imageUrl ? (
           <img
             src={article.imageUrl}
@@ -111,7 +112,7 @@ export function ArticleFeedCard({ article, onSelect, saved = false, onToggleSave
           <ImagePlaceholder category={article.category} />
         )}
         {/* Category badge */}
-        <span className="absolute left-3 top-3 rounded-full bg-white/90 px-2.5 py-0.5 text-xs font-semibold capitalize text-slate-700 shadow-sm backdrop-blur-sm">
+        <span className="absolute left-3 top-3 rounded-full bg-white/90 px-2.5 py-0.5 text-xs font-semibold capitalize text-slate-700 shadow-sm backdrop-blur-sm dark:bg-slate-900/90 dark:text-slate-300">
           {article.category}
         </span>
 
@@ -130,7 +131,7 @@ export function ArticleFeedCard({ article, onSelect, saved = false, onToggleSave
               'focus:outline-none focus:ring-2 focus:ring-brand-400',
               saved
                 ? 'bg-brand-500 text-white hover:bg-brand-600'
-                : 'bg-white/90 text-slate-600 hover:bg-white hover:text-brand-600',
+                : 'bg-white/90 text-slate-600 hover:bg-white hover:text-brand-600 dark:bg-slate-900/90 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-brand-400',
             )}
           >
             <BookmarkIcon filled={saved} />
@@ -140,22 +141,22 @@ export function ArticleFeedCard({ article, onSelect, saved = false, onToggleSave
 
       {/* Body */}
       <div className="flex flex-1 flex-col gap-2 p-4">
-        <h3 className="line-clamp-3 text-sm font-semibold leading-snug text-slate-900 group-hover:text-brand-700">
+        <h3 className="line-clamp-3 text-sm font-semibold leading-snug text-slate-900 group-hover:text-brand-700 dark:text-slate-100 dark:group-hover:text-brand-400">
           {article.title}
         </h3>
 
         {article.description && (
-          <p className="line-clamp-2 text-xs leading-relaxed text-slate-500">
+          <p className="line-clamp-2 text-xs leading-relaxed text-slate-500 dark:text-slate-400">
             {article.description}
           </p>
         )}
 
         {/* Footer: source + time */}
         <div className="mt-auto flex items-center justify-between gap-2 pt-2">
-          <span className="truncate text-xs font-medium text-slate-600">
+          <span className="truncate text-xs font-medium text-slate-600 dark:text-slate-400">
             {article.sourceName}
           </span>
-          <span className="flex-shrink-0 text-xs text-slate-400">
+          <span className="flex-shrink-0 text-xs text-slate-400 dark:text-slate-500">
             {article.relativeAge}
           </span>
         </div>

@@ -21,7 +21,7 @@ interface AppLayoutProps {
 
 export function AppLayout({ children }: AppLayoutProps) {
   return (
-    <div className="flex min-h-screen flex-col bg-slate-50">
+    <div className="flex min-h-screen flex-col bg-slate-50 dark:bg-slate-950">
       {/* Top navigation bar */}
       <Navbar />
 
@@ -31,7 +31,7 @@ export function AppLayout({ children }: AppLayoutProps) {
       </main>
 
       {/* Footer — shown above bottom nav on desktop, hidden-ish on mobile */}
-      <footer className="hidden md:block py-8 text-center text-xs text-slate-400 border-t border-slate-100">
+      <footer className="hidden md:block py-8 text-center text-xs text-slate-400 border-t border-slate-100 dark:border-slate-800 dark:text-slate-600">
         Morning Brief · Built with React, Tailwind, NewsAPI &amp; Claude · Clean Architecture
       </footer>
 

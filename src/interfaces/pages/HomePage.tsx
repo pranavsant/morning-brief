@@ -97,15 +97,17 @@ export function HomePage() {
     <div className="mx-auto max-w-screen-xl px-4 py-10">
       {/* ── Page header ─────────────────────────────────────────────────── */}
       <header className="mb-10 text-center">
-        <h1 className="font-serif text-4xl font-bold text-slate-900">☕ Morning Brief</h1>
-        <p className="mt-2 text-slate-600">
+        <h1 className="font-serif text-4xl font-bold text-slate-900 dark:text-slate-100">
+          ☕ Morning Brief
+        </h1>
+        <p className="mt-2 text-slate-600 dark:text-slate-400">
           Your day, summarised by Claude. Pick what matters and get a crisp digest.
         </p>
       </header>
 
       {/* ── Morning Brief generator ──────────────────────────────────────── */}
-      <section className="mb-12 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">
+      <section className="mb-12 rounded-xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
           Generate your morning brief
         </h2>
         <CategoryPicker selected={selected} onToggle={toggleCategory} disabled={briefLoading} />
@@ -127,7 +129,7 @@ export function HomePage() {
             <button
               type="button"
               onClick={reset}
-              className="text-sm font-medium text-slate-500 hover:text-slate-700"
+              className="text-sm font-medium text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
             >
               Clear
             </button>
@@ -145,7 +147,7 @@ export function HomePage() {
           </div>
         )}
         {!briefLoading && brief && (
-          <div className="mt-6 rounded-xl border border-slate-200 bg-slate-50 p-6">
+          <div className="mt-6 rounded-xl border border-slate-200 bg-slate-50 p-6 dark:border-slate-700 dark:bg-slate-800">
             <BriefView brief={brief} />
           </div>
         )}
@@ -155,12 +157,14 @@ export function HomePage() {
       <section>
         {/* ── Section header ──────────────────────────────────────────────── */}
         <div className="mb-4 flex items-center justify-between gap-4">
-          <h2 className="font-serif text-2xl font-bold text-slate-900">{feedSectionTitle}</h2>
+          <h2 className="font-serif text-2xl font-bold text-slate-900 dark:text-slate-100">
+            {feedSectionTitle}
+          </h2>
           {!isSearchActive && !feedLoading && (
             <button
               type="button"
               onClick={reload}
-              className="text-sm font-medium text-brand-600 hover:text-brand-800 focus:outline-none focus:underline"
+              className="text-sm font-medium text-brand-600 hover:text-brand-800 focus:outline-none focus:underline dark:text-brand-400 dark:hover:text-brand-300"
               aria-label="Refresh headlines"
             >
               ↻ Refresh
@@ -231,15 +235,15 @@ export function HomePage() {
                   {isSearchActive ? (
                     <>
                       <span className="mb-3 text-4xl" aria-hidden="true">🔍</span>
-                      <p className="text-base font-medium text-slate-700">
+                      <p className="text-base font-medium text-slate-700 dark:text-slate-300">
                         No results for &ldquo;{query.trim()}&rdquo;
                       </p>
-                      <p className="mt-1 text-sm text-slate-400">
+                      <p className="mt-1 text-sm text-slate-400 dark:text-slate-500">
                         Try different keywords or{' '}
                         <button
                           type="button"
                           onClick={clearSearch}
-                          className="font-medium text-brand-600 hover:text-brand-800 focus:underline focus:outline-none"
+                          className="font-medium text-brand-600 hover:text-brand-800 focus:underline focus:outline-none dark:text-brand-400 dark:hover:text-brand-300"
                         >
                           browse the top headlines
                         </button>
@@ -247,7 +251,7 @@ export function HomePage() {
                       </p>
                     </>
                   ) : (
-                    <p className="text-sm text-slate-400">
+                    <p className="text-sm text-slate-400 dark:text-slate-500">
                       No headlines available. Try refreshing.
                     </p>
                   )}
