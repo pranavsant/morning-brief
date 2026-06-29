@@ -12,8 +12,10 @@
 
 import { GenerateMorningBriefUseCase } from '../use-cases/GenerateMorningBriefUseCase';
 import { GetLatestBriefUseCase } from '../use-cases/GetLatestBriefUseCase';
+import { FetchTopHeadlinesUseCase } from '../use-cases/FetchTopHeadlinesUseCase';
 
 export interface IUseCaseRegistry {
   generateMorningBrief: GenerateMorningBriefUseCase;
   getLatestBrief:       GetLatestBriefUseCase;
+  fetchTopHeadlines:    FetchTopHeadlinesUseCase;
 }

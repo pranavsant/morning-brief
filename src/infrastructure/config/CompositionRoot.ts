@@ -12,6 +12,7 @@
 import { IUseCaseRegistry } from '@application/ports/IUseCaseRegistry';
 import { GenerateMorningBriefUseCase } from '@application/use-cases/GenerateMorningBriefUseCase';
 import { GetLatestBriefUseCase } from '@application/use-cases/GetLatestBriefUseCase';
+import { FetchTopHeadlinesUseCase } from '@application/use-cases/FetchTopHeadlinesUseCase';
 import { BriefAssemblyService } from '@domain/services/BriefAssemblyService';
 
 import { loadEnv } from './env';
@@ -51,8 +52,9 @@ export function buildUseCaseRegistry(): IUseCaseRegistry {
     summarisationService,
     briefAssemblyService,
   );
-  const getLatestBrief = new GetLatestBriefUseCase(briefRepository);
+  const getLatestBrief    = new GetLatestBriefUseCase(briefRepository);
+  const fetchTopHeadlines = new FetchTopHeadlinesUseCase(articleRepository);
 
-  cached = { generateMorningBrief, getLatestBrief };
+  cached = { generateMorningBrief, getLatestBrief, fetchTopHeadlines };
   return cached;
 }
