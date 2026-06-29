@@ -6,6 +6,10 @@
  * which in turn provides direct access to the "Read full article" link
  * and the "Summarize with AI" button.
  *
+ * An optional bookmark button floats in the top-right corner of the
+ * thumbnail. If `onToggleSaved` is provided it is shown; `saved`
+ * controls the filled/outlined icon state.
+ *
  * Layer: interfaces.
  */
 
@@ -16,6 +20,10 @@ interface Props {
   article: ArticleDTO;
   /** Called when the user clicks the card to open the detail modal. */
   onSelect: (article: ArticleDTO) => void;
+  /** Whether this article is currently bookmarked. */
+  saved?: boolean;
+  /** Called when the bookmark button is clicked. */
+  onToggleSaved?: (article: ArticleDTO) => void;
 }
 
 /** Placeholder shown when an article has no thumbnail. */
@@ -42,7 +50,44 @@ function categoryEmoji(category: string): string {
   return map[category] ?? '📰';
 }
 
-export function ArticleFeedCard({ article, onSelect }: Props) {
+/** Bookmark icon — filled when saved, outlined when not. */
+function BookmarkIcon({ filled }: { filled: boolean }) {
+  return filled ? (
+    /* Solid bookmark (saved) */
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 20 20"
+      fill="currentColor"
+      className="h-4 w-4"
+      aria-hidden="true"
+    >
+      <path
+        fillRule="evenodd"
+        d="M10 2c-1.716 0-3.408.106-5.07.31C3.806 2.45 3 3.414 3 4.517V17.25a.75.75 0 0 0 1.075.676L10 15.082l5.925 2.844A.75.75 0 0 0 17 17.25V4.517c0-1.103-.806-2.068-1.93-2.207A41.403 41.403 0 0 0 10 2Z"
+        clipRule="evenodd"
+      />
+    </svg>
+  ) : (
+    /* Outline bookmark (not saved) */
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      strokeWidth={1.5}
+      stroke="currentColor"
+      className="h-4 w-4"
+      aria-hidden="true"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z"
+      />
+    </svg>
+  );
+}
+
+export function ArticleFeedCard({ article, onSelect, saved = false, onToggleSaved }: Props) {
   return (
     <button
       type="button"
@@ -69,6 +114,28 @@ export function ArticleFeedCard({ article, onSelect }: Props) {
         <span className="absolute left-3 top-3 rounded-full bg-white/90 px-2.5 py-0.5 text-xs font-semibold capitalize text-slate-700 shadow-sm backdrop-blur-sm">
           {article.category}
         </span>
+
+        {/* Bookmark button */}
+        {onToggleSaved && (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onToggleSaved(article);
+            }}
+            aria-label={saved ? 'Remove bookmark' : 'Save article'}
+            aria-pressed={saved}
+            className={cn(
+              'absolute right-3 top-3 flex items-center justify-center rounded-full p-1.5 shadow-sm backdrop-blur-sm transition',
+              'focus:outline-none focus:ring-2 focus:ring-brand-400',
+              saved
+                ? 'bg-brand-500 text-white hover:bg-brand-600'
+                : 'bg-white/90 text-slate-600 hover:bg-white hover:text-brand-600',
+            )}
+          >
+            <BookmarkIcon filled={saved} />
+          </button>
+        )}
       </div>
 
       {/* Body */}

@@ -16,6 +16,7 @@ import { Navbar } from './components/Navbar';
 import { HomePage } from './pages/HomePage';
 import { BriefPage } from './pages/BriefPage';
 import { SettingsPage } from './pages/SettingsPage';
+import { SavedPage } from './pages/SavedPage';
 
 export function App() {
   return (
@@ -26,6 +27,7 @@ export function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/brief" element={<BriefPage />} />
           <Route path="/settings" element={<SettingsPage />} />
+          <Route path="/saved" element={<SavedPage />} />
         </Routes>
         <footer className="py-8 text-center text-xs text-slate-400">
           Morning Brief · Built with React, Tailwind, NewsAPI &amp; Claude · Clean Architecture

@@ -21,6 +21,7 @@ import { useMorningBrief } from '../hooks/useMorningBrief';
 import { useFeed } from '../hooks/useFeed';
 import { useSearch } from '../hooks/useSearch';
 import { useUserPreferences } from '../hooks/useUserPreferences';
+import { useSavedArticles } from '../hooks/useSavedArticles';
 import { CategoryPicker } from '../components/CategoryPicker';
 import { FeedCategoryBar } from '../components/FeedCategoryBar';
 import { SearchBar } from '../components/SearchBar';
@@ -71,6 +72,9 @@ export function HomePage() {
 
   // Persisted category preferences — shared with BriefPage and SettingsPage.
   const { categories: selected, toggleCategory } = useUserPreferences();
+
+  // Bookmarks — shared state so cards and modal stay in sync.
+  const { toggleSaved, isSaved } = useSavedArticles();
 
   const handleGenerate = () => {
     void generate({ categories: selected, maxArticlesPerCategory: 5, country: 'us' });
@@ -209,6 +213,8 @@ export function HomePage() {
                       key={article.id}
                       article={article}
                       onSelect={setSelectedArticle}
+                      saved={isSaved(article.id)}
+                      onToggleSaved={toggleSaved}
                     />
                   ))}
                 </div>
@@ -256,6 +262,8 @@ export function HomePage() {
       <ArticleDetailModal
         article={selectedArticle}
         onClose={() => setSelectedArticle(null)}
+        saved={selectedArticle ? isSaved(selectedArticle.id) : false}
+        onToggleSaved={toggleSaved}
       />
     </div>
   );

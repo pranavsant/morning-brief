@@ -9,8 +9,10 @@
  * closes it. Body scroll is locked while the modal is open.
  *
  * Props:
- *   article  — the ArticleDTO to display (null = modal is closed)
- *   onClose  — called when the user dismisses the modal
+ *   article        — the ArticleDTO to display (null = modal is closed)
+ *   onClose        — called when the user dismisses the modal
+ *   saved          — whether the article is currently bookmarked
+ *   onToggleSaved  — called when the bookmark button is clicked
  *
  * Layer: interfaces.
  */
@@ -26,9 +28,13 @@ import { cn } from '../lib/cn';
 interface Props {
   article: ArticleDTO | null;
   onClose: () => void;
+  /** Whether the current article is bookmarked. */
+  saved?: boolean;
+  /** Called when the user clicks the bookmark button. */
+  onToggleSaved?: (article: ArticleDTO) => void;
 }
 
-export function ArticleDetailModal({ article, onClose }: Props) {
+export function ArticleDetailModal({ article, onClose, saved = false, onToggleSaved }: Props) {
   const { status: sumStatus, summary, error: sumError, summarise, reset: resetSummary } = useArticleSummary();
   const { status: ctxStatus, bullets, error: ctxError, getContext, reset: resetContext } = useArticleContext();
 
@@ -316,13 +322,71 @@ export function ArticleDetailModal({ article, onClose }: Props) {
 
         {/* ── Footer ──────────────────────────────────────────────────────── */}
         <div className="flex items-center justify-between border-t border-slate-200 px-6 py-4">
-          <button
-            type="button"
-            onClick={onClose}
-            className="text-sm font-medium text-slate-500 hover:text-slate-700 focus:outline-none focus:underline"
-          >
-            Close
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={onClose}
+              className="text-sm font-medium text-slate-500 hover:text-slate-700 focus:outline-none focus:underline"
+            >
+              Close
+            </button>
+
+            {/* Bookmark toggle */}
+            {onToggleSaved && (
+              <button
+                type="button"
+                onClick={() => onToggleSaved(article)}
+                aria-pressed={saved}
+                aria-label={saved ? 'Remove bookmark' : 'Save article'}
+                className={cn(
+                  'flex items-center gap-1.5 rounded-lg border px-3 py-2 text-sm font-medium transition',
+                  'focus:outline-none focus:ring-2 focus:ring-brand-400',
+                  saved
+                    ? 'border-brand-400 bg-brand-50 text-brand-700 hover:bg-brand-100'
+                    : 'border-slate-200 bg-white text-slate-600 hover:border-brand-300 hover:text-brand-600',
+                )}
+              >
+                {saved ? (
+                  <>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                      className="h-4 w-4"
+                      aria-hidden="true"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M10 2c-1.716 0-3.408.106-5.07.31C3.806 2.45 3 3.414 3 4.517V17.25a.75.75 0 0 0 1.075.676L10 15.082l5.925 2.844A.75.75 0 0 0 17 17.25V4.517c0-1.103-.806-2.068-1.93-2.207A41.403 41.403 0 0 0 10 2Z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                    Saved
+                  </>
+                ) : (
+                  <>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={1.5}
+                      stroke="currentColor"
+                      className="h-4 w-4"
+                      aria-hidden="true"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z"
+                      />
+                    </svg>
+                    Save
+                  </>
+                )}
+              </button>
+            )}
+          </div>
+
           <a
             href={article.url}
             target="_blank"
