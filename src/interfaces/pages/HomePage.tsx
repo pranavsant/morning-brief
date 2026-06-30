@@ -17,7 +17,7 @@
  */
 
 import { useState } from 'react';
-import { useMorningBrief } from '../hooks/useMorningBrief';
+import { useMorningBriefContext } from '../context/MorningBriefContext';
 import { useFeed } from '../hooks/useFeed';
 import { useSearch } from '../hooks/useSearch';
 import { useUserPreferences } from '../hooks/useUserPreferences';
@@ -88,7 +88,7 @@ function FeedEmptyIllustration() {
 }
 
 export function HomePage() {
-  const { brief, loading: briefLoading, error: briefError, generate, reset } = useMorningBrief();
+  const { brief, loading: briefLoading, error: briefError, generate, reset } = useMorningBriefContext();
 
   // null = "All categories", a string = single-category filter
   const [activeCategory, setActiveCategory] = useState<string | null>(null);

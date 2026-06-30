@@ -6,12 +6,12 @@
  * Layer: interfaces.
  */
 
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { BriefDTO } from '@application/dtos/BriefDTO';
 import { GenerateMorningBriefInput } from '@application/use-cases/GenerateMorningBriefUseCase';
 import { useBriefController } from '../di/UseCaseContext';
 
-interface UseMorningBriefState {
+export interface UseMorningBriefState {
   brief: BriefDTO | null;
   loading: boolean;
   error: string | null;
@@ -44,6 +44,23 @@ export function useMorningBrief(): UseMorningBriefState {
     setBrief(null);
     setError(null);
   }, []);
+
+  // Hydrate from the persisted latest brief on first mount, so a brief
+  // generated earlier (on either page) is restored rather than lost.
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      const result = await controller.latest();
+      if (cancelled) return;
+      if (result.ok && result.data) {
+        // Don't clobber a brief generated while this request was in flight.
+        setBrief((current) => current ?? result.data);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [controller]);
 
   return { brief, loading, error, generate, reset };
 }

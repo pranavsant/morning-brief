@@ -9,12 +9,13 @@
  * rendered through BriefView.
  *
  * No business logic here — all state and side-effects are delegated to
- * the useMorningBrief hook.
+ * the shared MorningBriefContext, so the brief is the same instance shown
+ * on the Feed page and survives tab switches.
  *
  * Layer: interfaces.
  */
 
-import { useMorningBrief } from '../hooks/useMorningBrief';
+import { useMorningBriefContext } from '../context/MorningBriefContext';
 import { useUserPreferences } from '../hooks/useUserPreferences';
 import { CategoryPicker, CATEGORIES } from '../components/CategoryPicker';
 import { BriefView } from '../components/BriefView';
@@ -55,7 +56,7 @@ function BriefIdleIllustration() {
 }
 
 export function BriefPage() {
-  const { brief, loading, error, generate, reset } = useMorningBrief();
+  const { brief, loading, error, generate, reset } = useMorningBriefContext();
 
   // Read from and write to persisted user preferences.
   const { categories: selected, toggleCategory: toggle } = useUserPreferences();
